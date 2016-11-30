@@ -22,6 +22,7 @@ package com.irotsoma.cloudbackenc.cloudbackencui
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.MainView
 import javafx.scene.Scene
 import javafx.stage.Stage
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
@@ -30,6 +31,8 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
 import tornadofx.App
 import tornadofx.FX
+import tornadofx.get
+import java.util.*
 
 /**
  * TornadoFX app class launched by spring boot
@@ -44,31 +47,26 @@ import tornadofx.FX
 @SpringBootApplication
 open class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
     companion object{
-        private var savedArgs: Array<String> = emptyArray()
-        fun launchApp(args: Array<String>){
+        @JvmStatic private var savedArgs: Array<String> = emptyArray()
+        //launches the tornadoFX application
+        @JvmStatic fun launchApp(args: Array<String>){
             savedArgs = args
             launch(CloudBackEncUIApp::class.java, *args)
         }
     }
     private var applicationContext: ConfigurableApplicationContext? = null
 
-    @Autowired lateinit var mainView: MainView
-
-    @Value("\${app.ui.title}")
-    private var windowTitle: String? = null
-
     override fun init() {
+        //disable default stream handler to prevent factory already defined error when running as jar
+        TomcatURLStreamHandlerFactory.disable()
+        //run the spring boot app in the background
         applicationContext = SpringApplication.run(arrayOf(CloudBackEncUIApp::class.java), savedArgs)
         applicationContext!!.autowireCapableBeanFactory.autowireBean(this)
     }
 
     override fun start(stage: Stage) {
-        FX.registerApplication(this,stage)
-        stage.title = windowTitle
-        stage.scene = Scene(mainView.root)
-        stage.isResizable = true
-        stage.centerOnScreen()
-        stage.show()
+        //ResourceBundle.getBundle("messages",FX.locale)
+        super.start(stage)
     }
 
     override fun stop() {
@@ -78,7 +76,3 @@ open class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class)
 
 }
 
-fun main(args: Array<String>) {
-    CloudBackEncUIApp.launchApp(args)
-
-}

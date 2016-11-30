@@ -28,6 +28,7 @@ import javafx.stage.StageStyle
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import tornadofx.View
+import tornadofx.get
 
 
 /**
@@ -45,6 +46,7 @@ open class MainView : View() {
     val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")
     val menuUsersCreateUser : MenuItem by fxid("menuUsersCreateUser")
     init{
+        title = messages["cloudbackencui.title.application"]
         menuCloudServicesSetup.setOnAction{
             CloudServicesFragment().openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL, false)
         }
