@@ -20,18 +20,14 @@
 package com.irotsoma.cloudbackenc.cloudbackencui
 
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.MainView
-import javafx.scene.Scene
 import javafx.stage.Stage
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
 import tornadofx.App
 import tornadofx.FX
-import tornadofx.get
 import java.util.*
 
 /**
@@ -67,7 +63,6 @@ open class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class)
     }
 
     override fun start(stage: Stage) {
-        //ResourceBundle.getBundle("messages",FX.locale)
         super.start(stage)
     }
 
