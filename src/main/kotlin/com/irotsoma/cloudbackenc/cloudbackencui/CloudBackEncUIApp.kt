@@ -57,6 +57,8 @@ open class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class)
     private var applicationContext: ConfigurableApplicationContext? = null
 
     override fun init() {
+        //set the TornadoFX messages object to use the lowercase version of the resource bundle to match spring boot default (by default TornadoFX uses "Messages")
+        FX.messages = ResourceBundle.getBundle("messages")
         //disable default stream handler to prevent factory already defined error when running as jar
         TomcatURLStreamHandlerFactory.disable()
         //run the spring boot app in the background
