@@ -19,7 +19,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import com.irotsoma.cloudbackenc.common.cloudservice.CloudServiceExtension
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
 import javafx.beans.property.Property
 import tornadofx.ViewModel
 import tornadofx.observable

@@ -22,10 +22,10 @@ package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 import com.irotsoma.cloudbackenc.cloudbackencui.CloudServiceModel
 import com.irotsoma.cloudbackenc.cloudbackencui.applicationProperties
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
-import com.irotsoma.cloudbackenc.common.cloudservice.CloudServiceException
-import com.irotsoma.cloudbackenc.common.cloudservice.CloudServiceExtension
-import com.irotsoma.cloudbackenc.common.cloudservice.CloudServiceExtensionList
-import com.irotsoma.cloudbackenc.common.cloudservice.CloudServiceUser
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceException
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionList
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceUser
 import com.irotsoma.cloudbackenc.common.logger
 import javafx.collections.ObservableList
 import javafx.scene.control.Button
