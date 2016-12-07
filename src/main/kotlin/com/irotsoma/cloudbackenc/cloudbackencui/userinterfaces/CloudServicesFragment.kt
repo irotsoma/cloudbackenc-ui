@@ -120,7 +120,7 @@ class CloudServicesFragment() : Fragment() {
             if (applicationProperties["centralcontroller.disableCertificateValidation"] == "true"){
                 trustSelfSignedSSL()
             }
-            return RestTemplate().getForObject("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloudservices", CloudServiceExtensionList::class.java).observable()
+            return RestTemplate().getForObject("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-services", CloudServiceExtensionList::class.java).observable()
         }
         catch (e: ResourceAccessException){
             throwError(messages["cloudbackencui.error.getting.cloud.services.list"], e)
@@ -141,12 +141,12 @@ class CloudServicesFragment() : Fragment() {
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 
-        val callbackURL = "$protocol://$hostname:$port/cloudservicecallback"
+        val callbackURL = "$protocol://$hostname:$port/cloud-service-callback"
         LOG.debug("Calculated callback address: $callbackURL")
         val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId, null, availableCloudServicesModel.service.uuid.toString(), callbackURL), requestHeaders)
-        LOG.debug("Connecting to central controller cloud service login service at $protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloudservices/login/${availableCloudServicesModel.service.uuid}")
+        LOG.debug("Connecting to central controller cloud service login service at $protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-services/login/${availableCloudServicesModel.service.uuid}")
         runAsync {
-            val callResponse = RestTemplate().postForEntity("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloudservice/login/${availableCloudServicesModel.service.uuid}", httpEntity, CloudServiceUser.STATE::class.java)
+            val callResponse = RestTemplate().postForEntity("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-service/login/${availableCloudServicesModel.service.uuid}", httpEntity, CloudServiceUser.STATE::class.java)
             LOG.debug("Cloud service setup call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}")
             LOG.debug("Cloud service user state: ${callResponse.body.name}")
         }

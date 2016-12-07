@@ -42,7 +42,7 @@ import java.net.URI
 @RestController
 open class CloudServiceCallbackController {
     companion object { val LOG by logger() }
-    @RequestMapping("cloudservicecallback", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("cloud-service-callback", method = arrayOf(RequestMethod.POST))
     fun authenticate(@RequestBody url: CloudServiceCallbackURL) : ResponseEntity<Void> {
 
         //for controller tests
