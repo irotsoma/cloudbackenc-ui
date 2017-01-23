@@ -27,6 +27,8 @@ import javafx.stage.Modality
 import javafx.stage.StageStyle
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
+import tornadofx.View
+import tornadofx.get
 
 
 /**
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component
  *
  * Using @Lazy to allow for tests to run on the Spring services without launching the UI
  *
- * @author Justin Zak *
+ * @author Justin Zak
 */
 @Lazy
 @Component

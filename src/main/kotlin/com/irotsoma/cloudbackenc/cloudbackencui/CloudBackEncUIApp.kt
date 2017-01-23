@@ -26,6 +26,8 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
+import tornadofx.App
+import tornadofx.FX
 import java.util.*
 
 /**

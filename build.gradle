@@ -82,7 +82,7 @@ repositories {
     //kotlin 1.1 EAP
     maven {url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1'}
 }
-if (project.version.endsWith('-SNAPSHOT')) {
+if (!isReleaseVersion) {
     configurations.all {
         // check for updates every build
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
