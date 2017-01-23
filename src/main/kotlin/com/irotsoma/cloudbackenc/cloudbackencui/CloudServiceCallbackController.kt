@@ -40,7 +40,7 @@ import java.net.URI
  * @author Justin Zak
  */
 @RestController
-open class CloudServiceCallbackController {
+class CloudServiceCallbackController {
     companion object { val LOG by logger() }
     @RequestMapping("cloud-service-callback", method = arrayOf(RequestMethod.POST))
     fun authenticate(@RequestBody url: CloudServiceCallbackURL) : ResponseEntity<Void> {

@@ -27,8 +27,6 @@ import javafx.stage.Modality
 import javafx.stage.StageStyle
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import tornadofx.View
-import tornadofx.get
 
 
 /**
@@ -40,7 +38,7 @@ import tornadofx.get
 */
 @Lazy
 @Component
-open class MainView : View() {
+class MainView : View() {
     companion object { val LOG by logger() }
     override val root: VBox by fxml()
     val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")

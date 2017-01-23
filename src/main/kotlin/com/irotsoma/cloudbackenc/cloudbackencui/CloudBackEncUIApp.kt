@@ -26,8 +26,6 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
-import tornadofx.App
-import tornadofx.FX
 import java.util.*
 
 /**
@@ -41,7 +39,7 @@ import java.util.*
 
 @Lazy
 @SpringBootApplication
-open class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
+class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
     companion object{
         @JvmStatic private var savedArgs: Array<String> = emptyArray()
         //launches the tornadoFX application

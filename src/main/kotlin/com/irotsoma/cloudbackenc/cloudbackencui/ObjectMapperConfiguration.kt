@@ -29,10 +29,10 @@ import org.springframework.context.annotation.Primary
  * Register Kotlin module for Jackson
  */
 @Configuration
-open class ObjectMapperConfiguration {
+class ObjectMapperConfiguration {
     @Bean
     @Primary
-    open fun objectMapper() = ObjectMapper().apply {
+    fun objectMapper() = ObjectMapper().apply {
         registerModule(KotlinModule())
     }
 }

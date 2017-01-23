@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse
  * @author Justin Zak
  */
 @ControllerAdvice
-open class CloudServiceExceptionHandler : ResponseEntityExceptionHandler() {
+class CloudServiceExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(CloudServiceException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
