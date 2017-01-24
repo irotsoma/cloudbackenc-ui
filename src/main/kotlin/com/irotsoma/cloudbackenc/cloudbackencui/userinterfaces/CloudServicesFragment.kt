@@ -151,5 +151,4 @@ class CloudServicesFragment() : Fragment() {
             LOG.debug("Cloud service user state: ${callResponse.body.name}")
         }
     }
-
 }
