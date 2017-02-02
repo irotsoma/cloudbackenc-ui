@@ -33,7 +33,6 @@ class CloudServiceWebView(url: String) : View() {
     val cloudServiceWebViewLabel: Label by fxid("cloudServiceWebViewLabel")
     val cloudServiceWebViewHyperlink: Hyperlink by fxid("cloudServiceWebViewHyperlink")
     init {
-        //TODO: label should come from resource bundle
         cloudServiceWebView.engine.load(url)
         cloudServiceWebViewHyperlink.text = url
         cloudServiceWebViewLabel.text = messages["cloudbackencui.webview.header"]
