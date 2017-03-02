@@ -19,7 +19,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
-import com.irotsoma.cloudbackenc.cloudbackencui.applicationProperties
+import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
 import com.irotsoma.cloudbackenc.common.CloudBackEncRoles
 import com.irotsoma.cloudbackenc.common.CloudBackEncUser
@@ -52,7 +52,7 @@ class CreateUserFragment : Fragment() {
         title = messages["cloudbackencui.title.create.user"]
         with (cloudServiceCreateUserCancelButton){
             setOnAction{
-                closeModal()
+                close()
             }
         }
         with(cloudServiceCreateUserRoleList) {
@@ -76,7 +76,7 @@ class CreateUserFragment : Fragment() {
                     cloudServiceCreateUserErrorLabel.text = messages["cloudbackencui.message.user.role.required.error"]
                 } else {
                     SetupUser()
-                    closeModal()
+                    close()
                 }
             }
         }
@@ -84,11 +84,11 @@ class CreateUserFragment : Fragment() {
 
     private fun SetupUser() {
         LOG.debug("Attempting to create user: ${cloudServiceCreateUserIDField.text}.")
-        val protocol = if (applicationProperties["centralcontroller.useSSL"] == "true") "https" else "http"
+        val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
-        if ((applicationProperties["centralcontroller.useSSL"] == "true") && (applicationProperties["centralcontroller.disableCertificateValidation"] == "true")) {
+        if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
             trustSelfSignedSSL()
-            LOG.warn("SSL is enabled, but certificate validation is disabled.")
+            LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
         }
 
 
@@ -102,7 +102,7 @@ class CreateUserFragment : Fragment() {
         requestHeaders.add("Authorization", "Basic " + base64Creds)
         val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(cloudServiceCreateUserIDField.text,cloudServiceCreateUserPasswordField.text,cloudServiceCreateUserEmailField.text,true, cloudServiceCreateUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
         runAsync {
-            val callResponse = RestTemplate().postForEntity("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/users", httpEntity, CloudBackEncUser::class.java)
+            val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/users", httpEntity, CloudBackEncUser::class.java)
             LOG.debug("Create User call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}")
         }
     }

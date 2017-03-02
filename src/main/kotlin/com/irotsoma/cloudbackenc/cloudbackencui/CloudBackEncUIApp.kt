@@ -50,7 +50,7 @@ class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
             launch(CloudBackEncUIApp::class.java, *args)
         }
     }
-    private var applicationContext: ConfigurableApplicationContext? = null
+    var applicationContext: ConfigurableApplicationContext? = null
 
     override fun init() {
         //set the TornadoFX messages object to use the lowercase version of the resource bundle to match spring boot default (by default TornadoFX uses "Messages")
@@ -59,7 +59,7 @@ class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
         TomcatURLStreamHandlerFactory.disable()
         //run the spring boot app in the background
         applicationContext = SpringApplication.run(arrayOf(CloudBackEncUIApp::class.java), savedArgs)
-        applicationContext!!.autowireCapableBeanFactory.autowireBean(this)
+        applicationContext?.autowireCapableBeanFactory?.autowireBean(this)
     }
 
     override fun start(stage: Stage) {
@@ -68,7 +68,7 @@ class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
 
     override fun stop() {
         super.stop()
-        applicationContext!!.close()
+        applicationContext?.close()
     }
 
 }

@@ -19,8 +19,8 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
+import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
 import com.irotsoma.cloudbackenc.cloudbackencui.CloudServiceModel
-import com.irotsoma.cloudbackenc.cloudbackencui.applicationProperties
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceException
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
@@ -47,8 +47,10 @@ import java.util.*
  *
  * @author Justin Zak
 */
-class CloudServicesFragment() : Fragment() {
+
+class CloudServicesFragment : Fragment() {
     companion object { val LOG by logger() }
+
     override val root: VBox by fxml()
     val availableCloudServicesModel: CloudServiceModel = CloudServiceModel(CloudServiceExtension(UUID.randomUUID(),""))
     val cloudServicesSetupButton : Button by fxid("cloudServicesSetupButton")
@@ -114,13 +116,12 @@ class CloudServicesFragment() : Fragment() {
 
     fun getCloudServices() : ObservableList<CloudServiceExtension> {
         try {
-            //determine if ssl is enabled in settings
-            val protocol = if (applicationProperties["centralcontroller.useSSL"] == "true") "https" else "http"
-            //for testing use a hostname verifier that doesn't do any verification
-            if (applicationProperties["centralcontroller.disableCertificateValidation"] == "true"){
+            val restInterface = CentralControllerRestInterface()
+            if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
                 trustSelfSignedSSL()
+                CentralControllerRestInterface.LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
             }
-            return RestTemplate().getForObject("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-services", CloudServiceExtensionList::class.java).observable()
+            return RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList::class.java).observable()
         }
         catch (e: ResourceAccessException){
             throwError(messages["cloudbackencui.error.getting.cloud.services.list"], e)
@@ -130,23 +131,22 @@ class CloudServicesFragment() : Fragment() {
 
     fun setupCloudService(userId: String){
         LOG.debug("Attempting to set up cloud service ${availableCloudServicesModel.service.uuid}: ${availableCloudServicesModel.service.name}")
-        val protocol = if (applicationProperties["centralcontroller.useSSL"] == "true") "https" else "http"
-        val hostname = applicationProperties["server.address"]
-        val port = applicationProperties["server.port"]
+        val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
-        if ((applicationProperties["centralcontroller.useSSL"] == "true") && (applicationProperties["centralcontroller.disableCertificateValidation"] == "true")) {
+        if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
             trustSelfSignedSSL()
-            LOG.warn("SSL is enabled, but certificate validation is disabled.")
+            LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
         }
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 
-        val callbackURL = "$protocol://$hostname:$port/cloud-service-callback"
+        val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
         LOG.debug("Calculated callback address: $callbackURL")
         val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId, null, availableCloudServicesModel.service.uuid.toString(), callbackURL), requestHeaders)
-        LOG.debug("Connecting to central controller cloud service login service at $protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-services/login/${availableCloudServicesModel.service.uuid}")
+        val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${availableCloudServicesModel.service.uuid}"
+        LOG.debug("Connecting to central controller cloud service login service at $centralControllerURL")
         runAsync {
-            val callResponse = RestTemplate().postForEntity("$protocol://${applicationProperties["centralcontroller.host"]}:${applicationProperties["centralcontroller.port"]}/cloud-service/login/${availableCloudServicesModel.service.uuid}", httpEntity, CloudServiceUser.STATE::class.java)
+            val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
             LOG.debug("Cloud service setup call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}")
             LOG.debug("Cloud service user state: ${callResponse.body.name}")
         }
