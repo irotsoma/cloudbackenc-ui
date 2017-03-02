@@ -21,7 +21,7 @@ import java.net.InetAddress
 @Component
 class CentralControllerRestInterface {
     companion object { val LOG by logger() }
-    @Value("\${server.localPort}")
+    @Value("\${server.port}")
     var localPort: Int = 0
     @Value("\${server.ssl.key-store}")
     private var useSSL: String? = null
