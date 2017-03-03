@@ -41,6 +41,10 @@ import java.net.URI
  */
 @RestController
 class CloudServiceCallbackController {
+
+    //TODO: secure this to allow only calls from central controller
+
+
     companion object { val LOG by logger() }
     @RequestMapping("cloud-service-callback", method = arrayOf(RequestMethod.POST))
     fun authenticate(@RequestBody url: CloudServiceCallbackURL) : ResponseEntity<Void> {

@@ -15,6 +15,8 @@ import java.net.InetAddress
  * An autowired class that holds information required for making rest calls to the central controller.
  * This prevents requiring tornadoFX components to become spring components but still allows for autowiring settings.
  *
+ * Lazy to prevent it from being initialized during integration tests for callback controller.
+ *
  * @author Justin Zak
  */
 @Lazy
@@ -27,6 +29,8 @@ class CentralControllerRestInterface {
     private var useSSL: String? = null
     @Autowired
     var centralControllerSettings: CentralControllerSettings? = null
+    @Autowired
+    lateinit var userAccountRepository: UserAccountRepository
     final val localProtocol: String
     final val localHostname: String = InetAddress.getLocalHost().hostName
     final val centralControllerProtocol: String

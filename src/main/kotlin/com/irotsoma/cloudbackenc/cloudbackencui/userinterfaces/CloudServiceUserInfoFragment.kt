@@ -20,6 +20,7 @@
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
 import javafx.scene.control.Button
+import javafx.scene.control.PasswordField
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
 import tornadofx.Fragment
@@ -34,8 +35,10 @@ class CloudServiceUserInfoFragment(serviceName:String) : Fragment() {
     override val root: VBox by fxml()
 
     var userId: String? = null
+    var password: String? = null
 
     val cloudServiceUserInfoUserIDField : TextField by fxid("cloudServiceUserInfoUserIDField")
+    val cloudServiceUserInfoPasswordField : PasswordField by fxid("cloudServiceUserInfoPasswordField")
     val cloudServiceUserInfoOkButton: Button by fxid("cloudServiceUserInfoOkButton")
     val cloudServiceUserInfoCancelButton: Button by fxid("cloudServiceUserInfoCancelButton")
 
@@ -44,13 +47,15 @@ class CloudServiceUserInfoFragment(serviceName:String) : Fragment() {
         with(cloudServiceUserInfoOkButton){
             setOnAction{
                 userId = cloudServiceUserInfoUserIDField.text
-                closeModal()
+                password = cloudServiceUserInfoPasswordField.text
+                close()
             }
         }
         with(cloudServiceUserInfoCancelButton){
             setOnAction {
                 userId = null
-                closeModal()
+                password = null
+                close()
             }
         }
     }

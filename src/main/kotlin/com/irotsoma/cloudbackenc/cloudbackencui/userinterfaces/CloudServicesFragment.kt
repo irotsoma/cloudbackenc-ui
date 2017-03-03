@@ -52,7 +52,7 @@ class CloudServicesFragment : Fragment() {
     companion object { val LOG by logger() }
 
     override val root: VBox by fxml()
-    val availableCloudServicesModel: CloudServiceModel = CloudServiceModel(CloudServiceExtension(UUID.randomUUID(),""))
+    val cloudServiceModel: CloudServiceModel = CloudServiceModel(CloudServiceExtension(UUID.randomUUID(),""))
     val cloudServicesSetupButton : Button by fxid("cloudServicesSetupButton")
     val cloudServicesRefreshButton : Button by fxid("cloudServicesRefreshButton")
     val cloudServicesRemoveButton : Button by fxid("cloudServicesRemoveButton")
@@ -71,39 +71,38 @@ class CloudServicesFragment : Fragment() {
             }
             //uuid column
             with(column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)){
-                prefWidth=230.0
+                prefWidth=30.0
             }
             //name column
             with(column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name)){
                 prefWidth=270.0
             }
             //bind to list of services through model
-            availableCloudServicesModel.rebindOnChange(this){ selectedService -> service = selectedService ?: CloudServiceExtension(UUID.randomUUID(),"") }
+            cloudServiceModel.rebindOnChange(this){ selectedService -> service = selectedService ?: CloudServiceExtension(UUID.randomUUID(),"") }
             //only enable setup button if something is selected
             selectionModel.selectedItemProperty().onChange{
                 cloudServicesSetupButton.isDisable = it == null
             }
         }
-
         with (cloudServicesSetupButton){
             setOnAction {
-
-
-
-                //TODO: use the requiresUsername and requiresPassword options in CloudServiceExtension to determin if a username and/or password dialog should appear
-
-
-
-                val userInfoPopup = CloudServiceUserInfoFragment(availableCloudServicesModel.service.name)
-                LOG.debug("Attempting to open user ID popup.")
-                userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window,true)
-                LOG.debug("User entered: ${userInfoPopup.userId}")
-                if (userInfoPopup.userId != null) {
-                    setupCloudService(userInfoPopup.userId!!)
+                if (cloudServiceModel.service.requiresPassword || cloudServiceModel.service.requiresUsername) {
+                    val userInfoPopup = CloudServiceUserInfoFragment(cloudServiceModel.service.name)
+                    LOG.debug("Attempting to open user ID popup.")
+                    if (!cloudServiceModel.service.requiresUsername) {
+                        userInfoPopup.cloudServiceUserInfoUserIDField.isDisable = true
+                    }
+                    if (!cloudServiceModel.service.requiresPassword) {
+                        userInfoPopup.cloudServiceUserInfoPasswordField.isDisable = true
+                    }
+                    userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window, true)
+                    LOG.debug("User entered: ${userInfoPopup.userId ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}")
+                    setupCloudService(userInfoPopup.userId, userInfoPopup.password)
+                } else {
+                    setupCloudService (null, null)
                 }
             }
         }
-
         with (cloudServicesRefreshButton){
             setOnAction{
                 with (availableCloudServicesTable) {
@@ -114,13 +113,7 @@ class CloudServicesFragment : Fragment() {
                 }
             }
         }
-
     }
-    //moved the actual throw to a separate function to appease the compiler (unreachable code error).  This allows for adding a custom message to the throw.
-    fun throwError(message: String, e: Exception){
-        throw(CloudServiceException(message, e))
-    }
-
     fun getCloudServices() : ObservableList<CloudServiceExtension> {
         try {
             val restInterface = CentralControllerRestInterface()
@@ -128,7 +121,6 @@ class CloudServicesFragment : Fragment() {
                 trustSelfSignedSSL()
                 CentralControllerRestInterface.LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
             }
-
             val extensions =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList::class.java).observable()
             if (extensions.size < 1){
                 throw(CloudServiceException(messages["cloudbackencui.error.cloud.services.list.empty"]))
@@ -137,11 +129,10 @@ class CloudServicesFragment : Fragment() {
         }
         catch (e: ResourceAccessException){
             throw(CloudServiceException(messages["cloudbackencui.error.getting.cloud.services.list"], e))
-            //return CloudServiceExtensionList().observable() //this isn't used but is necessary to satisfy the compiler
         }
     }
-    fun setupCloudService(userId: String){
-        LOG.debug("Attempting to set up cloud service ${availableCloudServicesModel.service.uuid}: ${availableCloudServicesModel.service.name}")
+    fun setupCloudService(userId: String?, password: String?){
+        LOG.debug("Attempting to set up cloud service ${cloudServiceModel.service.uuid}: ${cloudServiceModel.service.name}")
         val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
         if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
@@ -150,11 +141,12 @@ class CloudServicesFragment : Fragment() {
         }
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //TODO: add central controller authentication here
 
         val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
         LOG.debug("Calculated callback address: $callbackURL")
-        val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId, null, availableCloudServicesModel.service.uuid.toString(), callbackURL), requestHeaders)
-        val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${availableCloudServicesModel.service.uuid}"
+        val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", password, cloudServiceModel.service.uuid.toString(), callbackURL), requestHeaders)
+        val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${cloudServiceModel.service.uuid}"
         LOG.debug("Connecting to central controller cloud service login service at $centralControllerURL")
         runAsync {
             val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)

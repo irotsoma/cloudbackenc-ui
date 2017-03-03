@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: irotsoma
+      changes:
+        - createTable:
+            tableName: user_account
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: nvarchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: irotsoma
+      changes:
+        - insert:
+            tableName: user_account
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: username
+                  value: test
+              - column:
+                  name: password
+                  value: '$2a$06$ncXfcuTwtLaktLL0epJYJuflWSjgaQuiMIFwxRt8e1wyhoKvllY3q'
+        - insert:
+            tableName: user_account
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: '$2a$06$8SUHH8rSwhF/KsAPGmjYy.CatNNV3GSv4YgkyKNcG47cdO6uccqTu'
