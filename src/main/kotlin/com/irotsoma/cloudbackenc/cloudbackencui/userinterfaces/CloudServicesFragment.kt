@@ -87,6 +87,13 @@ class CloudServicesFragment : Fragment() {
 
         with (cloudServicesSetupButton){
             setOnAction {
+
+
+
+                //TODO: use the requiresUsername and requiresPassword options in CloudServiceExtension to determin if a username and/or password dialog should appear
+
+
+
                 val userInfoPopup = CloudServiceUserInfoFragment(availableCloudServicesModel.service.name)
                 LOG.debug("Attempting to open user ID popup.")
                 userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window,true)
@@ -121,14 +128,18 @@ class CloudServicesFragment : Fragment() {
                 trustSelfSignedSSL()
                 CentralControllerRestInterface.LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
             }
-            return RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList::class.java).observable()
+
+            val extensions =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList::class.java).observable()
+            if (extensions.size < 1){
+                throw(CloudServiceException(messages["cloudbackencui.error.cloud.services.list.empty"]))
+            }
+            return extensions
         }
         catch (e: ResourceAccessException){
-            throwError(messages["cloudbackencui.error.getting.cloud.services.list"], e)
-            return CloudServiceExtensionList().observable() //this isn't used but is necessary to satisfy the compiler
+            throw(CloudServiceException(messages["cloudbackencui.error.getting.cloud.services.list"], e))
+            //return CloudServiceExtensionList().observable() //this isn't used but is necessary to satisfy the compiler
         }
     }
-
     fun setupCloudService(userId: String){
         LOG.debug("Attempting to set up cloud service ${availableCloudServicesModel.service.uuid}: ${availableCloudServicesModel.service.name}")
         val restInterface = CentralControllerRestInterface()
