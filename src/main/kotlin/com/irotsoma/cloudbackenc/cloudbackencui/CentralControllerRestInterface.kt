@@ -3,7 +3,6 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import com.irotsoma.cloudbackenc.common.logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
@@ -18,19 +17,22 @@ import java.net.InetAddress
  * Lazy to prevent it from being initialized during integration tests for callback controller.
  *
  * @author Justin Zak
+ * @property localPort Port that the current internal Spring REST server is using.
+ * @property useSSL Property that is used to determine if the internal Spring REST server is using SSL by checking for a key store.  Assumes no SSL if null.
+ * @property centralControllerSettings Autowired configuration bean that contains information to access the central controller.
+ * @property localProtocol Protocol portion of URI for the local REST server (http or https)
+ * @property localHostname Hostname of the internal Spring REST server.
+ * @property centralControllerProtocol Protocol portion of URI for accessing the Central Controller (http or https)
  */
 @Lazy
 @Component
 class CentralControllerRestInterface {
-    companion object { val LOG by logger() }
     @Value("\${server.port}")
     var localPort: Int = 0
     @Value("\${server.ssl.key-store}")
     private var useSSL: String? = null
     @Autowired
     var centralControllerSettings: CentralControllerSettings? = null
-    @Autowired
-    lateinit var userAccountRepository: UserAccountRepository
     final val localProtocol: String
     final val localHostname: String = InetAddress.getLocalHost().hostName
     final val centralControllerProtocol: String

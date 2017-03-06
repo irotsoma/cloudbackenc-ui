@@ -23,7 +23,15 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 /**
  * Repository object for storing user accounts
+ *
+ * @author Justin Zak
  */
 interface UserAccountRepository : JpaRepository<UserAccount, Long> {
+    /**
+     * Given a username returns an instance of [UserAccount] or null if the user does not exist
+     *
+     * @param username User name to lookup in database.
+     * @returns Instance of [UserAccount] for the given username or null if the user does not exist.
+     */
     fun findByUsername(username: String): UserAccount?
 }

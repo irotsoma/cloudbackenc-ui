@@ -26,7 +26,6 @@ import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServi
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionList
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceUser
-import com.irotsoma.cloudbackenc.common.logger
 import javafx.collections.ObservableList
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -34,6 +33,7 @@ import javafx.scene.control.TableView
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.StageStyle
+import mu.KLogging
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -49,8 +49,8 @@ import java.util.*
 */
 
 class CloudServicesFragment : Fragment() {
-    companion object { val LOG by logger() }
-
+    /** kotlin-logging implementation*/
+    companion object: KLogging()
     override val root: VBox by fxml()
     val cloudServiceModel: CloudServiceModel = CloudServiceModel(CloudServiceExtension(UUID.randomUUID(),""))
     val cloudServicesSetupButton : Button by fxid("cloudServicesSetupButton")
@@ -88,7 +88,7 @@ class CloudServicesFragment : Fragment() {
             setOnAction {
                 if (cloudServiceModel.service.requiresPassword || cloudServiceModel.service.requiresUsername) {
                     val userInfoPopup = CloudServiceUserInfoFragment(cloudServiceModel.service.name)
-                    LOG.debug("Attempting to open user ID popup.")
+                    logger.trace{"Attempting to open user ID popup."}
                     if (!cloudServiceModel.service.requiresUsername) {
                         userInfoPopup.cloudServiceUserInfoUserIDField.isDisable = true
                     }
@@ -96,7 +96,7 @@ class CloudServicesFragment : Fragment() {
                         userInfoPopup.cloudServiceUserInfoPasswordField.isDisable = true
                     }
                     userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window, true)
-                    LOG.debug("User entered: ${userInfoPopup.userId ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}")
+                    logger.trace{"User entered: ${userInfoPopup.userId ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
                     setupCloudService(userInfoPopup.userId, userInfoPopup.password)
                 } else {
                     setupCloudService (null, null)
@@ -119,7 +119,7 @@ class CloudServicesFragment : Fragment() {
             val restInterface = CentralControllerRestInterface()
             if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
                 trustSelfSignedSSL()
-                CentralControllerRestInterface.LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
+                logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
             }
             val extensions =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList::class.java).observable()
             if (extensions.size < 1){
@@ -132,26 +132,26 @@ class CloudServicesFragment : Fragment() {
         }
     }
     fun setupCloudService(userId: String?, password: String?){
-        LOG.debug("Attempting to set up cloud service ${cloudServiceModel.service.uuid}: ${cloudServiceModel.service.name}")
+        logger.debug{"Attempting to set up cloud service ${cloudServiceModel.service.uuid}: ${cloudServiceModel.service.name}"}
         val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
         if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
             trustSelfSignedSSL()
-            LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
+            logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
         }
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         //TODO: add central controller authentication here
 
         val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
-        LOG.debug("Calculated callback address: $callbackURL")
+        logger.debug{"Calculated callback address: $callbackURL"}
         val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", password, cloudServiceModel.service.uuid.toString(), callbackURL), requestHeaders)
         val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${cloudServiceModel.service.uuid}"
-        LOG.debug("Connecting to central controller cloud service login service at $centralControllerURL")
+        logger.debug{"Connecting to central controller cloud service login service at $centralControllerURL"}
         runAsync {
             val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
-            LOG.debug("Cloud service setup call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}")
-            LOG.debug("Cloud service user state: ${callResponse.body.name}")
+            logger.debug{"Cloud service setup call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}"}
+            logger.debug{"Cloud service user state: ${callResponse.body.name}"}
         }
     }
 }

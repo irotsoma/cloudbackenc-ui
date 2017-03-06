@@ -21,8 +21,8 @@ package com.irotsoma.cloudbackenc.cloudbackencui
 
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.CloudServiceWebView
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceCallbackURL
-import com.irotsoma.cloudbackenc.common.logger
 import javafx.application.Platform
+import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
@@ -41,17 +41,21 @@ import java.net.URI
  */
 @RestController
 class CloudServiceCallbackController {
+    /** kotlin-logging implementation*/
+    companion object: KLogging()
 
     //TODO: secure this to allow only calls from central controller
 
-
-    companion object { val LOG by logger() }
+    /**
+     * Receives the POST calls for OAuth cloud service authentication callbacks.
+     */
     @RequestMapping("cloud-service-callback", method = arrayOf(RequestMethod.POST))
     fun authenticate(@RequestBody url: CloudServiceCallbackURL) : ResponseEntity<Void> {
 
         //for controller tests
         val testUUID = "f8bed9c2-c68b-4ab4-a66a-f16a6b46b768"
         if (url.uuid == testUUID){
+            logger.info{"Sending test response."}
             return(ResponseEntity(HttpStatus.ACCEPTED))
         }
 
@@ -67,7 +71,7 @@ class CloudServiceCallbackController {
                     }
                 }
             } catch (e: Exception) {
-                LOG.debug("Error getting desktop to display authorization URL to user.  Will try custom view")
+                logger.debug{"Error getting desktop to display authorization URL to user.  Will try custom view"}
             }
             if (!browserSuccess) {
                 CloudServiceWebView(url.authorizationURL).openModal()

@@ -27,7 +27,13 @@ import tornadofx.*
  * @author Justin Zak
  */
 class CloudBackEncUIStyles : Stylesheet(){
-    companion object{
+    /**
+     * Companion object for style delegates
+     */
+    companion object style{
+        /**
+         * Css style for errors on text fields
+         */
         val error by cssclass()
     }
     init {

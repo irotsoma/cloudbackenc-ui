@@ -23,10 +23,10 @@ import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
 import com.irotsoma.cloudbackenc.common.CloudBackEncRoles
 import com.irotsoma.cloudbackenc.common.CloudBackEncUser
-import com.irotsoma.cloudbackenc.common.logger
 import javafx.collections.FXCollections
 import javafx.scene.control.*
 import javafx.scene.layout.VBox
+import mu.KLogging
 import org.apache.tomcat.util.codec.binary.Base64
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -36,7 +36,8 @@ import tornadofx.Fragment
 import tornadofx.get
 
 class CreateUserFragment : Fragment() {
-    companion object { val LOG by logger() }
+    /** kotlin-logging implementation*/
+    companion object: KLogging()
     override val root: VBox by fxml()
 
     val cloudServiceCreateUserIDField : TextField by fxid("cloudServiceCreateUserIDField")
@@ -83,12 +84,12 @@ class CreateUserFragment : Fragment() {
     }
 
     private fun SetupUser() {
-        LOG.debug("Attempting to create user: ${cloudServiceCreateUserIDField.text}.")
+        logger.debug{"Attempting to create user: ${cloudServiceCreateUserIDField.text}."}
         val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
         if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
             trustSelfSignedSSL()
-            LOG.warn("SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!")
+            logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
         }
 
 
@@ -103,7 +104,7 @@ class CreateUserFragment : Fragment() {
         val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(cloudServiceCreateUserIDField.text,cloudServiceCreateUserPasswordField.text,cloudServiceCreateUserEmailField.text,true, cloudServiceCreateUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
         runAsync {
             val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/users", httpEntity, CloudBackEncUser::class.java)
-            LOG.debug("Create User call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}")
+            logger.debug{"Create User call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}"}
         }
     }
 }

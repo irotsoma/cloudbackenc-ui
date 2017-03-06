@@ -20,7 +20,6 @@
 
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
-import com.irotsoma.cloudbackenc.common.logger
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
@@ -41,7 +40,6 @@ import tornadofx.get
 @Lazy
 @Component
 class MainView : View() {
-    companion object { val LOG by logger() }
     override val root: VBox by fxml()
     val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")
     val menuUsersCreateUser : MenuItem by fxid("menuUsersCreateUser")

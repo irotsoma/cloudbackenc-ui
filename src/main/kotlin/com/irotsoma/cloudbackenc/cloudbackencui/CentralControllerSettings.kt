@@ -16,8 +16,20 @@ import org.springframework.context.annotation.Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties("centralcontroller")
 class CentralControllerSettings {
+    /**
+     * Central Controller REST port number
+     */
     var port: Int = 0
+    /**
+     * Central Controller REST host name
+     */
     var host: String = ""
+    /**
+     * Is Central Controller using SSL?
+     */
     var useSSL: Boolean = false
+    /**
+     * Disables SSL certificate validation.  Should only be true for testing purposes with self signed certificates.
+     */
     var disableCertificateValidation: Boolean = false
 }

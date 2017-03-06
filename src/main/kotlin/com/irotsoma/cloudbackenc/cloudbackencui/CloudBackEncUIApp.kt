@@ -20,7 +20,6 @@
 package com.irotsoma.cloudbackenc.cloudbackencui
 
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.MainView
-import javafx.stage.Stage
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -43,15 +42,27 @@ import java.util.*
 @SpringBootApplication
 class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
     companion object{
+        /**
+         * Holds the command line arguments
+         */
         @JvmStatic private var savedArgs: Array<String> = emptyArray()
-        //launches the tornadoFX application
+        /**
+         * Allows for remotely launching the TornadoFX service
+         */
         @JvmStatic fun launchApp(args: Array<String>){
             savedArgs = args
             launch(CloudBackEncUIApp::class.java, *args)
         }
     }
+
+    /**
+     * Holds the Spring application context
+     */
     var applicationContext: ConfigurableApplicationContext? = null
 
+    /**
+     * Launch the Spring services while the tornadoFX services are launching
+     */
     override fun init() {
         //set the TornadoFX messages object to use the lowercase version of the resource bundle to match spring boot default (by default TornadoFX uses "Messages")
         FX.messages = ResourceBundle.getBundle("messages")
@@ -62,10 +73,9 @@ class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
         applicationContext?.autowireCapableBeanFactory?.autowireBean(this)
     }
 
-    override fun start(stage: Stage) {
-        super.start(stage)
-    }
-
+    /**
+     * Closes the spring services when the tornadoFX interface is stopped
+     */
     override fun stop() {
         super.stop()
         applicationContext?.close()
