@@ -14,23 +14,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 /*
- * Created by irotsoma on 8/15/2016.
+ * Created by justin on 3/29/17.
  */
+
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Component
+import tornadofx.FX
 
-/**
- * Repository object for storing user accounts
- *
- * @author Justin Zak
- */
-interface UserAccountRepository : JpaRepository<UserAccount, Long> {
-    /**
-     * Given a username returns an instance of [UserAccount] or null if the user does not exist
-     *
-     * @param username Username to lookup in database.
-     * @return Instance of [UserAccount] for the given username or null if the user does not exist.
-     */
-    fun findByUsername(username: String): UserAccount?
+
+@Lazy
+@Component
+class UserAccountManager {
+    @Autowired
+    lateinit var userAccountRepository: UserAccountRepository
+    init {
+        //get the current instance of the spring application and autowire beans in this class
+        val fxApplication = FX.application as CloudBackEncUIApp
+        fxApplication.applicationContext?.autowireCapableBeanFactory?.autowireBean(this)
+    }
 }

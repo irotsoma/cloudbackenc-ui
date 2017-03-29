@@ -20,14 +20,15 @@ package com.irotsoma.cloudbackenc.cloudbackencui
 
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
 import javafx.beans.property.Property
-import tornadofx.*
+import tornadofx.ViewModel
+import tornadofx.observable
 import java.util.*
 
 /**
  * View model class for binding CloudServiceExtension objects to UI components
  *
  * @author Justin Zak
- * @property service An instance of [CloudServiceExtension] to bind to a table
+ * @property service An instance of CloudServiceExtension to bind to a table
  * @property uuid Binds the cloud service UUID to the table.
  * @property name Binds the cloud service name to the table.
  * @property token Binds a cloud service's authentication token to a row.  Should not be displayed in the table.

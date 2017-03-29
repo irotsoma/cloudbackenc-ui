@@ -18,10 +18,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.irotsoma.cloudbackenc.common.CloudBackEncUser
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import javax.persistence.*
 
 /**
@@ -30,21 +27,11 @@ import javax.persistence.*
 @Entity
 @Table(name = "user_account")
 class UserAccount(@Column(name = "username", nullable = false) var username: String,
-                  password: String) {
-    companion object {
-        val PASSWORD_ENCODER: PasswordEncoder = BCryptPasswordEncoder()
-    }
+                  @Column(name = "token", nullable = false) var token: String) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-
-    @JsonIgnore
-    @Column(name="password", nullable=false)
-    var password: String? = password
-        set(value) {
-            field = PASSWORD_ENCODER.encode(value)
-        }
     fun cloudBackEncUser(): CloudBackEncUser {
-        return CloudBackEncUser(username, CloudBackEncUser.Companion.PASSWORD_MASKED, "", true, emptyList())
+        return CloudBackEncUser(username, CloudBackEncUser.PASSWORD_MASKED, "", true, emptyList())
     }
 }

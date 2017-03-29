@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse
 @ControllerAdvice
 class CloudServiceExceptionHandler : ResponseEntityExceptionHandler() {
     /**
-     * Generates a message for instances of [CloudServiceException] thrown by the callback controller
+     * Generates a message for instances of CloudServiceException thrown by the callback controller
      */
     @ExceptionHandler(CloudServiceException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

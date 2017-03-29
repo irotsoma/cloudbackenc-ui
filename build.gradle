@@ -92,6 +92,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'org.springframework.boot:spring-boot-starter-security'
+    optional "org.springframework.boot:spring-boot-devtools"
     optional 'org.springframework.boot:spring-boot-configuration-processor'
     //jackson
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
@@ -146,12 +147,6 @@ apply plugin: 'org.jetbrains.dokka'
 dokka {
     outputFormat = 'javadoc'
     outputDirectory = "$buildDir/docs/javadoc"
-    linkMapping {
-        dir = "src/main/kotlin"
-        url = "https://github.com/cy6erGn0m/vertx3-lang-kotlin/blob/master/src/main/kotlin"
-        suffix = "#L"
-    }
-    sourceDirs = files('src/main/kotlin')
 }
 task javadocJar(type: Jar, dependsOn: dokka) {
     classifier = 'javadoc'

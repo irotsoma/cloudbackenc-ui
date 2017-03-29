@@ -38,7 +38,7 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity){
         http
             .authorizeRequests()
-                .antMatchers("/console/**","/cloud-service-callback").permitAll() //TODO: turn off access to H2 console and enable auth on callback
+                .antMatchers("/h2-console/**","/cloud-service-callback").permitAll() //TODO: turn off access to H2 console and enable auth on callback
                 .anyRequest().authenticated() //but anything else requires authentication
                 .and()
             .httpBasic()

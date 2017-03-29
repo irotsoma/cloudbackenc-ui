@@ -19,7 +19,10 @@
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
 import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
+import com.irotsoma.cloudbackenc.cloudbackencui.UserAccount
+import com.irotsoma.cloudbackenc.cloudbackencui.UserAccountManager
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
+import com.irotsoma.cloudbackenc.common.AuthenticationToken
 import com.irotsoma.cloudbackenc.common.CloudBackEncRoles
 import com.irotsoma.cloudbackenc.common.CloudBackEncUser
 import javafx.collections.FXCollections
@@ -27,11 +30,10 @@ import javafx.scene.control.*
 import javafx.scene.layout.VBox
 import mu.KLogging
 import org.apache.tomcat.util.codec.binary.Base64
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.get
 
 class CreateUserFragment : Fragment() {
     /** kotlin-logging implementation*/
@@ -91,18 +93,34 @@ class CreateUserFragment : Fragment() {
         }
 
 
-        //TODO: remove hard coded username/password
+        //TODO: remove hard coded username/password and add popup to prompt for admin user login
 
-        val plainCreds = "admin:password".toByteArray()
-        val base64CredsBytes = Base64.encodeBase64(plainCreds)
-        val base64Creds = String(base64CredsBytes)
+        val plainCredentials = "admin:password".toByteArray()
+        val base64Credentials = String(Base64.encodeBase64(plainCredentials))
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        requestHeaders.add("Authorization", "Basic " + base64Creds)
-        val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(cloudServiceCreateUserIDField.text,cloudServiceCreateUserPasswordField.text,cloudServiceCreateUserEmailField.text,true, cloudServiceCreateUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
+        requestHeaders.add(HttpHeaders.AUTHORIZATION, "Basic $base64Credentials")
+        val newUsername = cloudServiceCreateUserIDField.text.trim()
+        val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(newUsername,cloudServiceCreateUserPasswordField.text,cloudServiceCreateUserEmailField.text,true, cloudServiceCreateUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
+        val plainUserCredentials = "$newUsername:${cloudServiceCreateUserPasswordField.text}".toByteArray()
+        val base64UserCredentials = String(Base64.encodeBase64(plainUserCredentials))
+        val tokenRequestHeaders = HttpHeaders()
+        tokenRequestHeaders.add(HttpHeaders.AUTHORIZATION, "Basic $base64UserCredentials")
+        val httpTokenEntity = HttpEntity<Any>(tokenRequestHeaders)
         runAsync {
+            //make call to add user
             val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/users", httpEntity, CloudBackEncUser::class.java)
             logger.debug{"Create User call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}"}
+            if (callResponse.statusCode == HttpStatus.CREATED) {
+                //make call to create a token
+                val tokenResponse = RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/auth", HttpMethod.GET, httpTokenEntity, AuthenticationToken::class.java)
+                if (tokenResponse.statusCode == HttpStatus.OK) {
+                    //update or insert user in database
+                    val userAccountRepository = UserAccountManager().userAccountRepository
+                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token)
+                    userAccountRepository.save(userAccount)
+                }
+            }
         }
     }
 }
