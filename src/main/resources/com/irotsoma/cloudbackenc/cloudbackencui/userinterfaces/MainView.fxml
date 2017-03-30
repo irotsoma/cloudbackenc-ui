@@ -24,6 +24,7 @@
         <menus>
             <Menu mnemonicParsing="false" text="%cloudbackencui.menu.users">
                <items>
+                  <MenuItem fx:id="menuUsersLogin" mnemonicParsing="false" text="%cloudbackencui.menuitem.login" />
                   <MenuItem fx:id="menuUsersCreateUser" mnemonicParsing="false" text="%cloudbackencui.menuitem.create.user" />
                </items>
             </Menu>
