@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import tornadofx.*
+import tornadofx.FX
 import java.net.InetAddress
 
 /**
@@ -60,4 +60,5 @@ class CentralControllerRestInterface {
         localProtocol = if (useSSL!=null && useSSL!="") "https" else "http"
         centralControllerProtocol = if (centralControllerSettings!!.useSSL) "https" else "http"
     }
+    //TODO: add better error handling UI for controller errors rather than displaying stack trace
 }

@@ -22,36 +22,37 @@ import javafx.scene.control.Button
 import javafx.scene.control.PasswordField
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.get
 
 /**
- * Cloud User Login ID Screen
+ * User Login Screen
  *
  * @author Justin Zak
  */
-class CloudServiceUserInfoFragment(serviceName:String) : Fragment() {
+class UserInfoFragment(serviceName:String) : Fragment() {
     override val root: VBox by fxml()
 
-    var userId: String? = null
+    var username: String? = null
     var password: String? = null
 
-    val cloudServiceUserInfoUserIDField : TextField by fxid("cloudServiceUserInfoUserIDField")
-    val cloudServiceUserInfoPasswordField : PasswordField by fxid("cloudServiceUserInfoPasswordField")
-    val cloudServiceUserInfoOkButton: Button by fxid("cloudServiceUserInfoOkButton")
-    val cloudServiceUserInfoCancelButton: Button by fxid("cloudServiceUserInfoCancelButton")
+    val userInfoUsernameField: TextField by fxid("userInfoUsernameField")
+    val userInfoPasswordField: PasswordField by fxid("userInfoPasswordField")
+    val userInfoOkButton: Button by fxid("userInfoOkButton")
+    val userInfoCancelButton: Button by fxid("userInfoCancelButton")
 
     init {
-        title = "${messages["cloudbackencui.title.enter.user.id"]} $serviceName"
-        with(cloudServiceUserInfoOkButton){
+        title = "${messages["cloudbackencui.title.enter.user.info"]} $serviceName"
+        with(userInfoOkButton){
             setOnAction{
-                userId = cloudServiceUserInfoUserIDField.text
-                password = cloudServiceUserInfoPasswordField.text
+                username = userInfoUsernameField.text
+                password = userInfoPasswordField.text
                 close()
             }
         }
-        with(cloudServiceUserInfoCancelButton){
+        with(userInfoCancelButton){
             setOnAction {
-                userId = null
+                username = null
                 password = null
                 close()
             }

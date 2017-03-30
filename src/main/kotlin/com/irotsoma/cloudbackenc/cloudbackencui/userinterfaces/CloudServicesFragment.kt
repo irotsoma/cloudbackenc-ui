@@ -86,17 +86,19 @@ class CloudServicesFragment : Fragment() {
         with (cloudServicesSetupButton){
             setOnAction {
                 if (cloudServiceModel.service.requiresPassword || cloudServiceModel.service.requiresUsername) {
-                    val userInfoPopup = CloudServiceUserInfoFragment(cloudServiceModel.service.name)
-                    logger.trace{"Attempting to open user ID popup."}
+                    val userInfoPopup = UserInfoFragment(cloudServiceModel.service.name)
+                    logger.trace{"Attempting to open user info popup."}
                     if (!cloudServiceModel.service.requiresUsername) {
-                        userInfoPopup.cloudServiceUserInfoUserIDField.isDisable = true
+                        userInfoPopup.userInfoUsernameField.isDisable = true
                     }
                     if (!cloudServiceModel.service.requiresPassword) {
-                        userInfoPopup.cloudServiceUserInfoPasswordField.isDisable = true
+                        userInfoPopup.userInfoPasswordField.isDisable = true
                     }
                     userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window, true)
-                    logger.trace{"User entered: ${userInfoPopup.userId ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
-                    setupCloudService(userInfoPopup.userId, userInfoPopup.password)
+                    logger.trace{"User entered: ${userInfoPopup.username ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
+                    if (userInfoPopup.username != null || userInfoPopup.password != null) {
+                        setupCloudService(userInfoPopup.username, userInfoPopup.password)
+                    }
                 } else {
                     setupCloudService (null, null)
                 }

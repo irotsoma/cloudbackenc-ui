@@ -28,6 +28,8 @@ import com.irotsoma.cloudbackenc.common.CloudBackEncUser
 import javafx.collections.FXCollections
 import javafx.scene.control.*
 import javafx.scene.layout.VBox
+import javafx.stage.Modality
+import javafx.stage.StageStyle
 import mu.KLogging
 import org.apache.tomcat.util.codec.binary.Base64
 import org.springframework.http.*
@@ -40,41 +42,41 @@ class CreateUserFragment : Fragment() {
     companion object: KLogging()
     override val root: VBox by fxml()
 
-    val cloudServiceCreateUserIDField : TextField by fxid("cloudServiceCreateUserIDField")
-    val cloudServiceCreateUserPasswordField: PasswordField by fxid("cloudServiceCreateUserPasswordField")
-    val cloudServiceCreateUserConfirmPasswordField : PasswordField by fxid("cloudServiceCreateUserConfirmPasswordField")
-    val cloudServiceCreateUserOkButton : Button by fxid("cloudServiceCreateUserOkButton")
-    val cloudServiceCreateUserCancelButton : Button by fxid("cloudServiceCreateUserCancelButton")
-    val cloudServiceCreateUserErrorLabel : Label by fxid("cloudServiceCreateUserErrorLabel")
-    val cloudServiceCreateUserEmailField : TextField by fxid("cloudServiceCreateUserEmailField")
-    val cloudServiceCreateUserRoleList : ListView<String> by fxid("cloudServiceCreateUserRoleList")
+    val createUserUsernameField: TextField by fxid("createUserUsernameField")
+    val createUserPasswordField: PasswordField by fxid("createUserPasswordField")
+    val createUserConfirmPasswordField: PasswordField by fxid("createUserConfirmPasswordField")
+    val createUserOkButton: Button by fxid("createUserOkButton")
+    val createUserCancelButton: Button by fxid("createUserCancelButton")
+    val createUserErrorLabel: Label by fxid("createUserErrorLabel")
+    val createUserEmailField: TextField by fxid("createUserEmailField")
+    val createUserRoleList: ListView<String> by fxid("createUserRoleList")
 
     init {
         title = messages["cloudbackencui.title.create.user"]
-        with (cloudServiceCreateUserCancelButton){
+        with (createUserCancelButton){
             setOnAction{
                 close()
             }
         }
-        with(cloudServiceCreateUserRoleList) {
+        with(createUserRoleList) {
             items = FXCollections.observableArrayList(CloudBackEncRoles.values().map { it.name })
             selectionModel.selectionMode = SelectionMode.MULTIPLE
         }
-        with (cloudServiceCreateUserOkButton){
+        with (createUserOkButton){
             setOnAction{
-                cloudServiceCreateUserErrorLabel.text = ""
-                cloudServiceCreateUserConfirmPasswordField.styleClass.removeAll("error")
-                if (cloudServiceCreateUserPasswordField.text != cloudServiceCreateUserConfirmPasswordField.text) {
-                    cloudServiceCreateUserErrorLabel.text = messages["cloudbackencui.message.password.mismatch.error"]
-                    with(cloudServiceCreateUserConfirmPasswordField) {
+                createUserErrorLabel.text = ""
+                createUserConfirmPasswordField.styleClass.removeAll("error")
+                if (createUserPasswordField.text != createUserConfirmPasswordField.text) {
+                    createUserErrorLabel.text = messages["cloudbackencui.message.password.mismatch.error"]
+                    with(createUserConfirmPasswordField) {
                         if (!styleClass.contains("error")) {
                             styleClass.add("error")
                         }
                     }
                     it.consume()
                 }
-                else if (cloudServiceCreateUserRoleList.selectionModel.selectedItems.size == 0){
-                    cloudServiceCreateUserErrorLabel.text = messages["cloudbackencui.message.user.role.required.error"]
+                else if (createUserRoleList.selectionModel.selectedItems.size == 0){
+                    createUserErrorLabel.text = messages["cloudbackencui.message.user.role.required.error"]
                 } else {
                     SetupUser()
                     close()
@@ -84,7 +86,7 @@ class CreateUserFragment : Fragment() {
     }
 
     private fun SetupUser() {
-        logger.debug{"Attempting to create user: ${cloudServiceCreateUserIDField.text}."}
+        logger.debug{"Attempting to create user: ${createUserUsernameField.text}."}
         val restInterface = CentralControllerRestInterface()
         //for testing use a hostname verifier that doesn't do any verification
         if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
@@ -94,19 +96,26 @@ class CreateUserFragment : Fragment() {
 
 
         //TODO: remove hard coded username/password and add popup to prompt for admin user login
-
-        val plainCredentials = "admin:password".toByteArray()
+        val userInfoPopup = UserInfoFragment("Administrator")
+        logger.trace{"Attempting to open user info popup."}
+        userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.currentWindow, true)
+        logger.trace{"User entered: ${userInfoPopup.username ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
+        if (userInfoPopup.username == null || userInfoPopup.password == null){
+            return
+        }
+        val plainCredentials = "${userInfoPopup.username?.trim()}:${userInfoPopup.password}".toByteArray()
         val base64Credentials = String(Base64.encodeBase64(plainCredentials))
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         requestHeaders.add(HttpHeaders.AUTHORIZATION, "Basic $base64Credentials")
-        val newUsername = cloudServiceCreateUserIDField.text.trim()
-        val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(newUsername,cloudServiceCreateUserPasswordField.text,cloudServiceCreateUserEmailField.text,true, cloudServiceCreateUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
-        val plainUserCredentials = "$newUsername:${cloudServiceCreateUserPasswordField.text}".toByteArray()
+        val newUsername = createUserUsernameField.text.trim()
+        val httpEntity = HttpEntity<CloudBackEncUser>(CloudBackEncUser(newUsername, createUserPasswordField.text, createUserEmailField.text,true, createUserRoleList.selectionModel.selectedItems.map{ it -> CloudBackEncRoles.valueOf(it)}), requestHeaders)
+        val plainUserCredentials = "$newUsername:${createUserPasswordField.text}".toByteArray()
         val base64UserCredentials = String(Base64.encodeBase64(plainUserCredentials))
         val tokenRequestHeaders = HttpHeaders()
         tokenRequestHeaders.add(HttpHeaders.AUTHORIZATION, "Basic $base64UserCredentials")
         val httpTokenEntity = HttpEntity<Any>(tokenRequestHeaders)
+        //TODO: add progress spinner
         runAsync {
             //make call to add user
             val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/users", httpEntity, CloudBackEncUser::class.java)
@@ -119,6 +128,7 @@ class CreateUserFragment : Fragment() {
                     val userAccountRepository = UserAccountManager().userAccountRepository
                     val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token)
                     userAccountRepository.save(userAccount)
+                    //TODO: add success message popup
                 }
             }
         }

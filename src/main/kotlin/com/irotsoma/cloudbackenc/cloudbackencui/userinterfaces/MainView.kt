@@ -25,7 +25,8 @@ import javafx.stage.Modality
 import javafx.stage.StageStyle
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import tornadofx.*
+import tornadofx.View
+import tornadofx.get
 
 
 /**
@@ -39,8 +40,8 @@ import tornadofx.*
 @Component
 class MainView : View() {
     override val root: VBox by fxml()
-    val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")
-    val menuUsersCreateUser : MenuItem by fxid("menuUsersCreateUser")
+    final val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")
+    final val menuUsersCreateUser : MenuItem by fxid("menuUsersCreateUser")
     init{
         title = messages["cloudbackencui.title.application"]
         menuCloudServicesSetup.setOnAction{
