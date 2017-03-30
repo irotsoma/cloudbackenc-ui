@@ -37,8 +37,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import tornadofx.View
-import tornadofx.get
+import tornadofx.*
 
 
 /**
@@ -85,7 +84,7 @@ class MainView : View() {
                     if (tokenResponse.statusCode == HttpStatus.OK) {
                         //update or insert user in database
                         val userAccountRepository = UserAccountManager().userAccountRepository
-                        val userAccount = userAccountRepository.findByUsername(user) ?: UserAccount(user, tokenResponse.body.token)
+                        val userAccount = userAccountRepository.findByUsername(user) ?: UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
                         userAccountRepository.save(userAccount)
                         //TODO: add success message popup
                     }

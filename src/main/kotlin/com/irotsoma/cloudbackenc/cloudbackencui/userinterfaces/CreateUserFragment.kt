@@ -34,8 +34,7 @@ import mu.KLogging
 import org.apache.tomcat.util.codec.binary.Base64
 import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
-import tornadofx.Fragment
-import tornadofx.get
+import tornadofx.*
 
 class CreateUserFragment : Fragment() {
     /** kotlin-logging implementation*/
@@ -126,7 +125,7 @@ class CreateUserFragment : Fragment() {
                 if (tokenResponse.statusCode == HttpStatus.OK) {
                     //update or insert user in database
                     val userAccountRepository = UserAccountManager().userAccountRepository
-                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token)
+                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token,tokenResponse.body.tokenExpiration)
                     userAccountRepository.save(userAccount)
                     //TODO: add success message popup
                 }

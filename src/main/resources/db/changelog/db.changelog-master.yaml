@@ -1,26 +1,31 @@
 databaseChangeLog:
   - changeSet:
-      id: 1
-      author: irotsoma
-      changes:
-        - createTable:
-            tableName: user_account
-            columns:
-              - column:
-                  name: id
-                  type: int
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: username
-                  type: nvarchar(255)
-                  constraints:
-                    unique: true
-                    nullable: false
-              - column:
-                  name: token
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: false
+    id: 1
+    author: irotsoma
+    changes:
+      - createTable:
+        tableName: user_account
+        columns:
+          - column:
+            name: id
+            type: int
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              nullable: false
+          - column:
+            name: username
+            type: nvarchar(255)
+            constraints:
+              unique: true
+              nullable: false
+          - column:
+            name: token
+            type: nvarchar(255)
+            constraints:
+              nullable: false
+          - column:
+            name: token_expiration
+            type: datetime
+            constraints:
+              nullable: true

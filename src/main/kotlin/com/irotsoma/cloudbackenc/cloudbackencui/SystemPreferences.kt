@@ -14,28 +14,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 /*
- * Created by irotsoma on 8/15/2016.
+ * Created by justin on 3/30/17.
  */
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import java.util.*
-import javax.persistence.*
+import java.util.prefs.Preferences
 
-/**
- * User Account Object
- *
- * @author Justin Zak
- * @property id Unique database id for user
- * @property username Username of user.
- * @property token Login token for Central Controller.
- * @property tokenExpiration Expiration date/time of the token.
- */
-@Entity
-@Table(name = "user_account")
-class UserAccount(@Column(name = "username", nullable = false) var username: String,
-                  @Column(name = "token", nullable = false) var token: String,
-                  @Column(name="token_expiration",nullable = true) var tokenExpiration: Date?) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
+object SystemPreferences{
+    const val ACTIVE_USER_PREFERENCE_KEY = "ACTIVE_USER"
+    val systemPreferences: Preferences? = Preferences.systemNodeForPackage(this::class.java)
+    var activeUser: Long = systemPreferences?.getLong(ACTIVE_USER_PREFERENCE_KEY, -1) ?: -1
+    set(value){
+        systemPreferences?.putLong(ACTIVE_USER_PREFERENCE_KEY, value)
+        field = value
+    }
 }
