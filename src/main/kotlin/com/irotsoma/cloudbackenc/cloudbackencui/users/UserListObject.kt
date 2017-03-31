@@ -18,6 +18,4 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.users
 
-import java.util.*
-
-data class UserListObject(var username:String, var tokenExpiration: Date, var isDefault:Boolean = false)
+data class UserListObject(var userId:Long, var username:String, var isLoggedIn: Boolean, var isDefault:Boolean = false)

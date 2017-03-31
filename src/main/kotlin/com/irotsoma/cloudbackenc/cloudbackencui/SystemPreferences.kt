@@ -22,7 +22,7 @@ import java.util.prefs.Preferences
 
 object SystemPreferences{
     const val ACTIVE_USER_PREFERENCE_KEY = "ACTIVE_USER"
-    val systemPreferences: Preferences? = Preferences.systemNodeForPackage(this::class.java)
+    val systemPreferences: Preferences? = Preferences.userNodeForPackage(this::class.java)
     var activeUser: Long = systemPreferences?.getLong(ACTIVE_USER_PREFERENCE_KEY, -1) ?: -1
     set(value){
         systemPreferences?.putLong(ACTIVE_USER_PREFERENCE_KEY, value)

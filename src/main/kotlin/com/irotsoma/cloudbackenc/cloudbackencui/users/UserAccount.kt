@@ -34,8 +34,8 @@ import javax.persistence.*
 @Table(name = "user_account")
 class UserAccount(@Column(name = "username", nullable = false) var username: String,
                   @Column(name = "token", nullable = false) var token: String,
-                  @Column(name="token_expiration",nullable = false) var tokenExpiration: Date) {
+                  @Column(name="token_expiration",nullable = false) var tokenExpiration: Date?) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
+    var id: Long = -1
 }

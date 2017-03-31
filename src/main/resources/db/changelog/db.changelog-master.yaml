@@ -28,4 +28,4 @@ databaseChangeLog:
                   name: token_expiration
                   type: datetime
                   constraints:
-                    nullable: false
+                    nullable: true

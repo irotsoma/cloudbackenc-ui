@@ -21,7 +21,6 @@ package com.irotsoma.cloudbackenc.cloudbackencui.users
 
 import javafx.beans.property.Property
 import tornadofx.*
-import java.util.*
 
 /**
  *
@@ -29,7 +28,8 @@ import java.util.*
  * @author Justin Zak
  */
 class UserAccountModel(var userAccountListObject: UserListObject): ViewModel() {
+    val userId: Property<Long> = bind{userAccountListObject.observable(UserListObject::userId)}
     val username: Property<String> = bind{userAccountListObject.observable(UserListObject::username)}
-    val tokenExpiration: Property<Date> = bind{userAccountListObject.observable(UserListObject::tokenExpiration)}
+    val isLoggedIn: Property<Boolean> = bind{userAccountListObject.observable(UserListObject::isLoggedIn)}
     val isDefault: Property<Boolean> = bind{userAccountListObject.observable(UserListObject::isDefault)}
 }
