@@ -17,12 +17,13 @@
  * Created by justin on 3/29/17.
  */
 
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.users
 
+import com.irotsoma.cloudbackenc.cloudbackencui.CloudBackEncUIApp
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import tornadofx.FX
+import tornadofx.*
 
 
 @Lazy

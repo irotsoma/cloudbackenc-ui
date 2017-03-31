@@ -16,9 +16,8 @@
 /*
  * Created by irotsoma on 3/30/17.
  */
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.users
 
 import java.util.*
 
-
-data class UserListObject(var isDefault:Boolean, var username:String,var tokenExpiration: Date?)
+data class UserListObject(var username:String, var tokenExpiration: Date, var isDefault:Boolean = false)

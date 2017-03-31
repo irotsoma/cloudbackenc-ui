@@ -70,11 +70,11 @@ class CloudServicesFragment : Fragment() {
             }
             //uuid column
             with(column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)){
-                prefWidth=30.0
+                prefWidth=150.0
             }
             //name column
             with(column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name)){
-                prefWidth=270.0
+                prefWidth=150.0
             }
             //bind to list of services through model
             cloudServiceModel.rebindOnChange(this){ selectedService -> service = selectedService ?: CloudServiceExtension(UUID.randomUUID(),"") }

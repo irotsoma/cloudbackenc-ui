@@ -13,29 +13,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-/*
- * Created by irotsoma on 8/15/2016.
- */
-package com.irotsoma.cloudbackenc.cloudbackencui
-
-import java.util.*
-import javax.persistence.*
 
 /**
- * User Account Object
+ * Created by irotsoma on 3/31/17.
+ */
+package com.irotsoma.cloudbackenc.cloudbackencui.users
+
+import javafx.beans.property.Property
+import tornadofx.*
+import java.util.*
+
+/**
+ *
  *
  * @author Justin Zak
- * @property id Unique database id for user
- * @property username Username of user.
- * @property token Login token for Central Controller.
- * @property tokenExpiration Expiration date/time of the token.
  */
-@Entity
-@Table(name = "user_account")
-class UserAccount(@Column(name = "username", nullable = false) var username: String,
-                  @Column(name = "token", nullable = false) var token: String,
-                  @Column(name="token_expiration",nullable = true) var tokenExpiration: Date?) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
+class UserAccountModel(var userAccountListObject: UserListObject): ViewModel() {
+    val username: Property<String> = bind{userAccountListObject.observable(UserListObject::username)}
+    val tokenExpiration: Property<Date> = bind{userAccountListObject.observable(UserListObject::tokenExpiration)}
+    val isDefault: Property<Boolean> = bind{userAccountListObject.observable(UserListObject::isDefault)}
 }

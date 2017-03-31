@@ -16,7 +16,7 @@
 /*
  * Created by irotsoma on 8/15/2016.
  */
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.users
 
 import org.springframework.data.jpa.repository.JpaRepository
 

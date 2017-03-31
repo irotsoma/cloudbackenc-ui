@@ -19,9 +19,9 @@
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
 import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
-import com.irotsoma.cloudbackenc.cloudbackencui.UserAccount
-import com.irotsoma.cloudbackenc.cloudbackencui.UserAccountManager
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccount
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountManager
 import com.irotsoma.cloudbackenc.common.AuthenticationToken
 import com.irotsoma.cloudbackenc.common.CloudBackEncRoles
 import com.irotsoma.cloudbackenc.common.CloudBackEncUser
@@ -35,6 +35,7 @@ import org.apache.tomcat.util.codec.binary.Base64
 import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
 import tornadofx.*
+import java.util.*
 
 class CreateUserFragment : Fragment() {
     /** kotlin-logging implementation*/
@@ -125,7 +126,8 @@ class CreateUserFragment : Fragment() {
                 if (tokenResponse.statusCode == HttpStatus.OK) {
                     //update or insert user in database
                     val userAccountRepository = UserAccountManager().userAccountRepository
-                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token,tokenResponse.body.tokenExpiration)
+                    //Note: sets expiration to 100 years in the future if it's null as a workaround for no expiration date
+                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token,tokenResponse.body.tokenExpiration?: Date(Date().time + 3155695200000L))
                     userAccountRepository.save(userAccount)
                     //TODO: add success message popup
                 }

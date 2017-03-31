@@ -18,7 +18,10 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
-import com.irotsoma.cloudbackenc.cloudbackencui.UserListObject
+import com.irotsoma.cloudbackenc.cloudbackencui.SystemPreferences
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountManager
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserListObject
+import javafx.collections.ObservableList
 import javafx.scene.control.Button
 import javafx.scene.control.TableView
 import javafx.scene.layout.VBox
@@ -31,6 +34,18 @@ class UserListFragment : Fragment() {
     val listUsersUserTable: TableView<UserListObject> by fxid("listUsersUserTable")
     init {
         title = messages["cloudbackencui.title.user.list"]
-
+        with(listUsersUserTable){
+            asyncItems {
+                getUsers()
+            }
+        }
     }
+    fun getUsers() : ObservableList<UserListObject>{
+        val userAccountManager = UserAccountManager()
+        val userAccounts= userAccountManager.userAccountRepository.findAll()
+        val userList = ArrayList<UserListObject>()
+        userAccounts.mapTo(userList) { UserListObject(it.username, it.tokenExpiration, it.id == SystemPreferences.activeUser) }
+        return userList.observable()
+    }
+
 }

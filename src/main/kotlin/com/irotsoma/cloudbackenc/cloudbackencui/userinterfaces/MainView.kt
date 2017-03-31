@@ -20,9 +20,9 @@
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
 import com.irotsoma.cloudbackenc.cloudbackencui.CentralControllerRestInterface
-import com.irotsoma.cloudbackenc.cloudbackencui.UserAccount
-import com.irotsoma.cloudbackenc.cloudbackencui.UserAccountManager
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccount
+import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountManager
 import com.irotsoma.cloudbackenc.common.AuthenticationToken
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.VBox
@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import tornadofx.*
+import java.util.*
 
 
 /**
@@ -56,6 +57,7 @@ class MainView : View() {
     final val menuCloudServicesSetup : MenuItem by fxid("menuCloudServicesSetup")
     final val menuUsersCreateUser : MenuItem by fxid("menuUsersCreateUser")
     final val menuUsersLogin: MenuItem by fxid("menuUsersLogin")
+    final val menuUsersList: MenuItem by fxid("menuUsersList")
     init{
         title = messages["cloudbackencui.title.application"]
         menuCloudServicesSetup.setOnAction{
@@ -63,6 +65,9 @@ class MainView : View() {
         }
         menuUsersCreateUser.setOnAction {
             CreateUserFragment().openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, false)
+        }
+        menuUsersList.setOnAction{
+            UserListFragment().openModal(StageStyle.DECORATED,Modality.APPLICATION_MODAL, false)
         }
         menuUsersLogin.setOnAction {
             val userInfoPopup = UserInfoFragment(messages["cloudbackencui.title.product"]).apply{openModal(StageStyle.UTILITY,Modality.APPLICATION_MODAL, false, this.currentWindow, true)}
@@ -84,7 +89,7 @@ class MainView : View() {
                     if (tokenResponse.statusCode == HttpStatus.OK) {
                         //update or insert user in database
                         val userAccountRepository = UserAccountManager().userAccountRepository
-                        val userAccount = userAccountRepository.findByUsername(user) ?: UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
+                        val userAccount = userAccountRepository.findByUsername(user) ?: UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration?: Date(Date().time + 3155695200000L))
                         userAccountRepository.save(userAccount)
                         //TODO: add success message popup
                     }
