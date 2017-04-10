@@ -37,7 +37,7 @@ import org.springframework.test.context.junit4.SpringRunner
 class CloudServiceCallbackControllerTest {
     @LocalServerPort
     private var port: Int = 0
-    @Value("\${server.ssl.key-store}")
+    @Value("\${server.ssl.key-store:#{null}}")
     private var useSSL: String? = null
 
     //TODO: add SSL test once implemented in controller

@@ -16,7 +16,7 @@
 buildscript {
     ext.commonVersion = '0.2-SNAPSHOT'
     ext.springBootVersion = '1.5.2.RELEASE'
-    ext.tornadofxVersion = '1.7.1'
+    ext.tornadofxVersion = '1.7.0'
     ext.junitVersion = '4.12'
     ext.kotlinVersion = '1.1.1'
     ext.jacksonVersion = '2.8.6'
