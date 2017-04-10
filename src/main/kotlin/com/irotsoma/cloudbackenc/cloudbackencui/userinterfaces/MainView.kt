@@ -88,7 +88,13 @@ class MainView : View() {
                     if (tokenResponse.statusCode == HttpStatus.OK) {
                         //update or insert user in database
                         val userAccountRepository = UserAccountManager().userAccountRepository
-                        val userAccount = userAccountRepository.findByUsername(user) ?: UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
+                        val userAccount = userAccountRepository.findByUsername(user)
+                        if (userAccount == null){
+                            UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
+                        } else {
+                            userAccount.token = tokenResponse.body.token
+                            userAccount.tokenExpiration = tokenResponse.body.tokenExpiration
+                        }
                         userAccountRepository.save(userAccount)
                         //TODO: add success message popup
                     }

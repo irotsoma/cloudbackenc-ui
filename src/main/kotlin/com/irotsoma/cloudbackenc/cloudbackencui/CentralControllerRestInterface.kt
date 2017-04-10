@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-import tornadofx.FX
+import tornadofx.*
 import java.net.InetAddress
 
 /**
@@ -45,7 +45,7 @@ import java.net.InetAddress
 class CentralControllerRestInterface {
     @Value("\${server.port}")
     var localPort: Int = 0
-    @Value("\${server.ssl.key-store}")
+    @Value("\${server.ssl.key-store:#{null}}")
     private var useSSL: String? = null
     @Autowired
     var centralControllerSettings: CentralControllerSettings? = null

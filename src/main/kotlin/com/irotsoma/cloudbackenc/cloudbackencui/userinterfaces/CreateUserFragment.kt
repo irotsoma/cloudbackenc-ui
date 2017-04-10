@@ -126,8 +126,13 @@ class CreateUserFragment : Fragment() {
                     //update or insert user in database
                     val userAccountRepository = UserAccountManager().userAccountRepository
                     //Note: sets expiration to 100 years in the future if it's null as a workaround for no expiration date
-                    val userAccount = userAccountRepository.findByUsername(newUsername) ?: UserAccount(newUsername,tokenResponse.body.token,tokenResponse.body.tokenExpiration)
-                    userAccountRepository.save(userAccount)
+                    val userAccount = userAccountRepository.findByUsername(newUsername)
+                    if (userAccount == null){
+                        UserAccount(newUsername, tokenResponse.body.token, tokenResponse.body.tokenExpiration)
+                    } else {
+                        userAccount.token = tokenResponse.body.token
+                        userAccount.tokenExpiration = tokenResponse.body.tokenExpiration
+                    }
                     //TODO: add success message popup
                 }
             }

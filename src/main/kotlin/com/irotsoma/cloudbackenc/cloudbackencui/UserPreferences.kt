@@ -20,7 +20,7 @@ package com.irotsoma.cloudbackenc.cloudbackencui
 
 import java.util.prefs.Preferences
 
-object SystemPreferences{
+object UserPreferences {
     const val ACTIVE_USER_PREFERENCE_KEY = "ACTIVE_USER"
     val systemPreferences: Preferences? = Preferences.userNodeForPackage(this::class.java)
     var activeUser: Long = systemPreferences?.getLong(ACTIVE_USER_PREFERENCE_KEY, -1) ?: -1

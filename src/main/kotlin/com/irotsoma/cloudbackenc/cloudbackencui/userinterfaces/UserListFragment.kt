@@ -18,7 +18,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces
 
-import com.irotsoma.cloudbackenc.cloudbackencui.SystemPreferences
+import com.irotsoma.cloudbackenc.cloudbackencui.UserPreferences
 import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountManager
 import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountModel
 import com.irotsoma.cloudbackenc.cloudbackencui.users.UserListObject
@@ -57,7 +57,7 @@ class UserListFragment : Fragment() {
         }
         with(listUsersSetDefaultButton){
             setOnAction{
-                SystemPreferences.activeUser = userAccountModel.userAccountListObject.userId
+                UserPreferences.activeUser = userAccountModel.userAccountListObject.userId
                 with (listUsersUserTable) {
                     items.clear()
                     asyncItems {
@@ -72,7 +72,7 @@ class UserListFragment : Fragment() {
         val userAccounts= userAccountManager.userAccountRepository.findAll()
         val userList = ArrayList<UserListObject>()
 
-        userAccounts.mapTo(userList) { UserListObject(it.id, it.username, (it.tokenExpiration ?: Date(Long.MAX_VALUE) > Date()) , it.id == SystemPreferences.activeUser) }
+        userAccounts.mapTo(userList) { UserListObject(it.id, it.username, (it.tokenExpiration ?: Date(Long.MAX_VALUE) > Date()) , it.id == UserPreferences.activeUser) }
         return userList.observable()
     }
 

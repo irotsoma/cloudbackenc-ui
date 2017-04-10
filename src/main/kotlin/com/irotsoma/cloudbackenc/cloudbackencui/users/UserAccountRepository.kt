@@ -33,4 +33,11 @@ interface UserAccountRepository : JpaRepository<UserAccount, Long> {
      * @return Instance of [UserAccount] for the given username or null if the user does not exist.
      */
     fun findByUsername(username: String): UserAccount?
+    /**
+     * Given a user database ID returns an instance of [UserAccount] or null if the user does not exist
+     *
+     * @param userId User database ID to lookup in database.
+     * @return Instance of [UserAccount] for the given user ID or null if the user does not exist.
+     */
+    fun findById(userId:Long): UserAccount?
 }
