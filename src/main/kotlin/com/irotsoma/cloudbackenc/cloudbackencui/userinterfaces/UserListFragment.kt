@@ -32,7 +32,7 @@ import java.util.*
 
 class UserListFragment : Fragment() {
     override val root: VBox by fxml()
-    val userAccountModel: UserAccountModel = UserAccountModel(UserListObject(-1,"",false,false))
+    val userAccountModel: UserAccountModel by inject()
     val listUsersSetDefaultButton: Button by fxid("listUsersSetDefaultButton")
     val listUsersUserTable: TableView<UserListObject> by fxid("listUsersUserTable")
     init {
@@ -41,23 +41,18 @@ class UserListFragment : Fragment() {
             asyncItems {
                 getUsers()
             }
-            with(column(messages["cloudbackencui.column.user.loggedin"], UserListObject::isLoggedIn)){
-                prefWidth=75.0
-            }
-            with(column(messages["cloudbackencui.column.user.username"], UserListObject::username)){
-                prefWidth=200.0
-            }
-            with(column(messages["cloudbackencui.column.user.default"], UserListObject::isDefault)){
-                prefWidth=75.0
-            }
-            userAccountModel.rebindOnChange(this){selectedAccount -> userAccountListObject = selectedAccount ?: UserListObject(-1,"",false,false)}
+            column(messages["cloudbackencui.column.user.logged.in"], UserListObject::isLoggedIn).useCheckbox(false)
+            column(messages["cloudbackencui.column.user.username"], UserListObject::username).remainingWidth()
+            column(messages["cloudbackencui.column.user.default"], UserListObject::isDefault).useCheckbox(false)
+            bindSelected(userAccountModel)
             selectionModel.selectedItemProperty().onChange{
                 listUsersSetDefaultButton.isDisable = it == null
             }
+            columnResizePolicy = SmartResize.POLICY
         }
         with(listUsersSetDefaultButton){
             setOnAction{
-                UserPreferences.activeUser = userAccountModel.userAccountListObject.userId
+                UserPreferences.activeUser = userAccountModel.item.userId
                 with (listUsersUserTable) {
                     items.clear()
                     asyncItems {

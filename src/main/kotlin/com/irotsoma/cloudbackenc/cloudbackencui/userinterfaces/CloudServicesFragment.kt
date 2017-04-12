@@ -28,6 +28,7 @@ import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServi
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionList
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceUser
 import javafx.collections.ObservableList
+import javafx.concurrent.WorkerStateEvent
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TableView
@@ -42,7 +43,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import tornadofx.*
-import java.util.*
 
 /**
  * Cloud Services UI functionality
@@ -54,10 +54,11 @@ class CloudServicesFragment : Fragment() {
     /** kotlin-logging implementation*/
     companion object: KLogging()
     override val root: VBox by fxml()
-    val cloudServiceModel: CloudServiceModel = CloudServiceModel(CloudServiceExtension(UUID.randomUUID(),""))
+    val cloudServiceModel: CloudServiceModel by inject()
     val cloudServicesSetupButton : Button by fxid("cloudServicesSetupButton")
     val cloudServicesRefreshButton : Button by fxid("cloudServicesRefreshButton")
     val cloudServicesRemoveButton : Button by fxid("cloudServicesRemoveButton")
+    val availableCloudServiceModel: CloudServiceModel by inject()
     val availableCloudServicesTable : TableView<CloudServiceExtension> by fxid("availableCloudServicesTable")
     val activeCloudServicesTable : TableView<CloudServiceExtension> by fxid("activeCloudServicesTable")
     val userAccountRepository = UserAccountManager().userAccountRepository
@@ -72,23 +73,22 @@ class CloudServicesFragment : Fragment() {
             asyncItems {
                 val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
                 getCloudServices(username)
-            }
+            }.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, {availableCloudServicesTable.placeholder = null})
+
             //uuid column
-            with(column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)){
-                prefWidth=150.0
-            }
+            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)
             //name column
-            with(column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name)){
-                prefWidth=150.0
-            }
+            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name)
             //bind to list of services through model
-            cloudServiceModel.rebindOnChange(this){ selectedService -> service = selectedService ?: CloudServiceExtension(UUID.randomUUID(),"") }
+            bindSelected(cloudServiceModel)
             //only enable setup button if something is selected
             selectionModel.selectedItemProperty().onChange{
                 cloudServicesSetupButton.isDisable = it == null
             }
+            columnResizePolicy = SmartResize.POLICY
         }
         with (activeCloudServicesTable){
+            placeholder = Label(messages["cloudbackencui.message.loading.services"])
             asyncItems {
                 val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
                 if (username != null) {
@@ -100,66 +100,68 @@ class CloudServicesFragment : Fragment() {
                 } else {
                     emptyList<CloudServiceExtension>().observable()
                 }
-            }
+            }.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, {activeCloudServicesTable.placeholder = null})
             //uuid column
-            with(column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)){
-                prefWidth=150.0
-            }
+            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::uuid)
             //name column
-            with(column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name)){
-                prefWidth=150.0
-            }
+            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::name).remainingWidth()
+
             //bind to list of services through model
-            cloudServiceModel.rebindOnChange(this){ selectedService -> service = selectedService ?: CloudServiceExtension(UUID.randomUUID(),"") }
+            bindSelected(availableCloudServiceModel)
             //only enable remove button if something is selected
             selectionModel.selectedItemProperty().onChange{
                 cloudServicesRemoveButton.isDisable = it == null
             }
+            columnResizePolicy = SmartResize.POLICY
         }
-        with (cloudServicesSetupButton){
-            setOnAction {
-                if (cloudServiceModel.service.requiresPassword || cloudServiceModel.service.requiresUsername) {
-                    val userInfoPopup = UserInfoFragment(cloudServiceModel.service.name)
-                    logger.trace{"Attempting to open user info popup."}
-                    if (!cloudServiceModel.service.requiresUsername) {
-                        userInfoPopup.userInfoUsernameField.isDisable = true
-                    }
-                    if (!cloudServiceModel.service.requiresPassword) {
-                        userInfoPopup.userInfoPasswordField.isDisable = true
-                    }
-                    userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, this.scene.window, true)
-                    logger.trace{"User entered: ${userInfoPopup.username ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
-                    if (userInfoPopup.username != null || userInfoPopup.password != null) {
-                        setupCloudService(userInfoPopup.username, userInfoPopup.password)
-                    }
-                } else {
-                    setupCloudService (null, null)
+        cloudServicesSetupButton.setOnAction {
+            if (cloudServiceModel.item.requiresPassword || cloudServiceModel.item.requiresUsername) {
+                val userInfoPopup = UserInfoFragment(cloudServiceModel.item.name)
+                logger.trace{"Attempting to open user info popup."}
+                if (!cloudServiceModel.item.requiresUsername) {
+                    userInfoPopup.userInfoUsernameField.isDisable = true
                 }
+                if (!cloudServiceModel.item.requiresPassword) {
+                    userInfoPopup.userInfoPasswordField.isDisable = true
+                }
+                userInfoPopup.openModal(StageStyle.UTILITY, Modality.WINDOW_MODAL, false, cloudServicesSetupButton.scene.window, true)
+                logger.trace{"User entered: ${userInfoPopup.username ?: ""} : ${if (userInfoPopup.password.isNullOrBlank()) "" else "Password Masked"}"}
+                if (userInfoPopup.username != null || userInfoPopup.password != null) {
+                    setupCloudService(userInfoPopup.username, userInfoPopup.password)
+                }
+            } else {
+                setupCloudService (null, null)
             }
         }
-        with (cloudServicesRefreshButton){
-            setOnAction{
-                with (availableCloudServicesTable) {
-                    items.clear()
-                    asyncItems {
-                        val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
-                        getCloudServices(username)
+
+        cloudServicesRemoveButton.setOnAction {
+            removeCloudService()
+        }
+
+        cloudServicesRefreshButton.setOnAction{
+            refreshTables()
+        }
+    }
+    fun refreshTables(){
+        with (availableCloudServicesTable) {
+            items.clear()
+            asyncItems {
+                val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
+                getCloudServices(username)
+            }
+        }
+        with (activeCloudServicesTable){
+            items.clear()
+            asyncItems {
+                val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
+                if (username != null) {
+                    try{
+                        getLoggedInCloudServices(username)
+                    }catch (e: Exception){
+                        emptyList<CloudServiceExtension>().observable()
                     }
-                }
-                with (activeCloudServicesTable){
-                    items.clear()
-                    asyncItems {
-                        val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
-                        if (username != null) {
-                            try{
-                                getLoggedInCloudServices(username)
-                            }catch (e: Exception){
-                                emptyList<CloudServiceExtension>().observable()
-                            }
-                        } else {
-                            emptyList<CloudServiceExtension>().observable()
-                        }
-                    }
+                } else {
+                    emptyList<CloudServiceExtension>().observable()
                 }
             }
         }
@@ -211,29 +213,57 @@ class CloudServicesFragment : Fragment() {
         }
     }
     fun setupCloudService(userId: String?, password: String?){
-        logger.debug{"Attempting to set up cloud service ${cloudServiceModel.service.uuid}: ${cloudServiceModel.service.name}"}
-        val restInterface = CentralControllerRestInterface()
-        //for testing use a hostname verifier that doesn't do any verification
-        if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
-            trustSelfSignedSSL()
-            logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
+        if (cloudServiceModel.isNotEmpty) {
+            logger.debug { "Attempting to set up cloud service ${cloudServiceModel.item.uuid}: ${cloudServiceModel.item.name}" }
+            val restInterface = CentralControllerRestInterface()
+            //for testing use a hostname verifier that doesn't do any verification
+            if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
+                trustSelfSignedSSL()
+                logger.warn { "SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!" }
+            }
+            val requestHeaders = HttpHeaders()
+            requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            //TODO: Check token for expiration or null and prompt for login
+
+            val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
+            requestHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
+
+            val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
+            logger.debug { "Calculated callback address: $callbackURL" }
+            val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", password, cloudServiceModel.item.uuid.toString(), callbackURL), requestHeaders)
+            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${cloudServiceModel.item.uuid}"
+            logger.debug { "Connecting to central controller cloud service login service at $centralControllerURL" }
+            runAsync {
+                val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
+                logger.debug { "Cloud service setup call response: ${callResponse?.statusCode}: ${callResponse?.statusCode?.name}" }
+                logger.debug { "Cloud service user state: ${callResponse?.body?.name}" }
+            } ui {
+                refreshTables()
+            }
         }
-        val requestHeaders = HttpHeaders()
-        requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        //TODO: Check token for expiration or null and prompt for login
-
-        val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
-        requestHeaders.add(HttpHeaders.AUTHORIZATION,"Bearer $userToken")
-
-        val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
-        logger.debug{"Calculated callback address: $callbackURL"}
-        val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", password, cloudServiceModel.service.uuid.toString(), callbackURL), requestHeaders)
-        val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${cloudServiceModel.service.uuid}"
-        logger.debug{"Connecting to central controller cloud service login service at $centralControllerURL"}
-        runAsync {
-            val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
-            logger.debug{"Cloud service setup call response: ${callResponse?.statusCode}: ${callResponse?.statusCode?.name}"}
-            logger.debug{"Cloud service user state: ${callResponse?.body?.name}"}
+    }
+    fun removeCloudService(){
+        if (availableCloudServiceModel.isNotEmpty) {
+            logger.debug { "Attempting to log out of cloud service ${availableCloudServiceModel.item.uuid}: ${availableCloudServiceModel.item.name}" }
+            val restInterface = CentralControllerRestInterface()
+            //for testing use a hostname verifier that doesn't do any verification
+            if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
+                trustSelfSignedSSL()
+                logger.warn { "SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!" }
+            }
+            val requestHeaders = HttpHeaders()
+            requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
+            requestHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
+            val httpEntity = HttpEntity<Any>(requestHeaders)
+            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/logout/${availableCloudServiceModel.item.uuid}"
+            runAsync {
+                val callResponse = RestTemplate().exchange(centralControllerURL, HttpMethod.GET, httpEntity, CloudServiceUser.STATE::class.java)
+                logger.debug { "Cloud service logout call response: ${callResponse?.statusCode}: ${callResponse?.statusCode?.name}" }
+                logger.debug { "Cloud service user state: ${callResponse?.body?.name}" }
+            } ui {
+                refreshTables()
+            }
         }
     }
 }

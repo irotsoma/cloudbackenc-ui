@@ -14,12 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-/**
+/*
  * Created by irotsoma on 3/31/17.
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.users
 
-import javafx.beans.property.Property
 import tornadofx.*
 
 /**
@@ -27,9 +26,9 @@ import tornadofx.*
  *
  * @author Justin Zak
  */
-class UserAccountModel(var userAccountListObject: UserListObject): ViewModel() {
-    val userId: Property<Long> = bind{userAccountListObject.observable(UserListObject::userId)}
-    val username: Property<String> = bind{userAccountListObject.observable(UserListObject::username)}
-    val isLoggedIn: Property<Boolean> = bind{userAccountListObject.observable(UserListObject::isLoggedIn)}
-    val isDefault: Property<Boolean> = bind{userAccountListObject.observable(UserListObject::isDefault)}
+class UserAccountModel: ItemViewModel<UserListObject>() {
+    val userId = bind{item?.userIdProperty()}
+    val username = bind{item?.usernameProperty()}
+    val isLoggedIn = bind{item?.isLoggedInProperty()}
+    val isDefault = bind{item?.isDefaultProperty()}
 }

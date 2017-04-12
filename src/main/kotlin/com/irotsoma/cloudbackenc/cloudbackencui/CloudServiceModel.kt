@@ -19,22 +19,17 @@
 package com.irotsoma.cloudbackenc.cloudbackencui
 
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
-import javafx.beans.property.Property
-import tornadofx.ViewModel
-import tornadofx.observable
-import java.util.*
+import tornadofx.*
 
 /**
  * View model class for binding CloudServiceExtension objects to UI components
  *
  * @author Justin Zak
- * @property service An instance of CloudServiceExtension to bind to a table
  * @property uuid Binds the cloud service UUID to the table.
  * @property name Binds the cloud service name to the table.
  * @property token Binds a cloud service's authentication token to a row.  Should not be displayed in the table.
  */
-class CloudServiceModel(var service: CloudServiceExtension) : ViewModel() {
-    val uuid: Property<UUID> = bind { service.observable(CloudServiceExtension::uuid) }
-    val name: Property<String> = bind { service.observable(CloudServiceExtension::name) }
-    val token: Property<String> = bind { service.observable(CloudServiceExtension::token) }
+class CloudServiceModel : ItemViewModel<CloudServiceExtension>() {
+    val uuid = bind { item?.observable(CloudServiceExtension::uuid) }
+    val name = bind { item?.observable(CloudServiceExtension::name) }
 }

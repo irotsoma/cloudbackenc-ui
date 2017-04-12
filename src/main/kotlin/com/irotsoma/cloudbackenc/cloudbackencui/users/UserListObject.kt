@@ -18,4 +18,18 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.users
 
-data class UserListObject(var userId:Long, var username:String, var isLoggedIn: Boolean, var isDefault:Boolean = false)
+import tornadofx.*
+
+class UserListObject(userId:Long, username:String, isLoggedIn: Boolean, isDefault:Boolean = false){
+    var userId: Long by property(userId)
+    fun userIdProperty() = getProperty(UserListObject::userId)
+
+    var username by property(username)
+    fun usernameProperty() = getProperty(UserListObject::username)
+
+    var isLoggedIn by property(isLoggedIn)
+    fun isLoggedInProperty() = getProperty(UserListObject::isLoggedIn)
+
+    var isDefault by property(isDefault)
+    fun isDefaultProperty() = getProperty(UserListObject::isDefault)
+}
