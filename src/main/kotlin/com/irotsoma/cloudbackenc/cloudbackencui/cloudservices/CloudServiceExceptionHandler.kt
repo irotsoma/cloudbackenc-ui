@@ -16,7 +16,7 @@
 /*
  * Created by irotsoma on 7/13/2016.
  */
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.cloudservices
 
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceException
 import org.springframework.http.HttpStatus
@@ -38,7 +38,7 @@ class CloudServiceExceptionHandler : ResponseEntityExceptionHandler() {
      */
     @ExceptionHandler(CloudServiceException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleCloudServiceException(response: HttpServletResponse, exception:CloudServiceException) : String?{
+    fun handleCloudServiceException(response: HttpServletResponse, exception: CloudServiceException) : String?{
         response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.message)
         return exception.message
     }

@@ -16,34 +16,46 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>
   -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane prefHeight="374.0" prefWidth="1133.0">
+      <GridPane prefHeight="400.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="300.0" percentWidth="45.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" percentWidth="10.0" prefWidth="99.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="300.0" percentWidth="45.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="372.0" minHeight="10.0" prefHeight="353.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="104.0" minHeight="0.0" prefHeight="31.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <AnchorPane layoutX="7.0" layoutY="7.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="620.0" AnchorPane.topAnchor="7.0">
+            <TableView fx:id="availableCloudServicesTable" prefHeight="250.0" prefWidth="532.0" />
+            <TableView fx:id="activeCloudServicesTable" prefHeight="250.0" prefWidth="502.0" GridPane.columnIndex="2" />
+            <Button fx:id="cloudServicesRefreshButton" mnemonicParsing="false" text="%cloudbackencui.button.refresh" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
                <children>
-                  <TableView fx:id="availableCloudServicesTable" prefHeight="250.0" prefWidth="502.0" AnchorPane.bottomAnchor="42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <HBox alignment="BOTTOM_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                     <children>
-                        <Button fx:id="cloudServicesRefreshButton" mnemonicParsing="false" text="%cloudbackencui.button.refresh" />
-                     </children>
-                  </HBox>
+                  <Button fx:id="cloudServicesSetupButton" disable="true" mnemonicParsing="false" text="%cloudbackencui.button.setup.with.arrow">
+                     <VBox.margin>
+                        <Insets bottom="50.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="cloudServicesRemoveButton" disable="true" mnemonicParsing="false" text="%cloudbackencui.button.remove.with.arrow">
+                     <VBox.margin>
+                        <Insets bottom="30.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
-            </AnchorPane>
-            <AnchorPane layoutX="624.0" layoutY="7.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="620.0" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0">
-               <children>
-                  <TableView fx:id="activeCloudServicesTable" prefHeight="250.0" prefWidth="502.0" AnchorPane.bottomAnchor="42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <HBox alignment="BOTTOM_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                     <children>
-                        <Button fx:id="cloudServicesRemoveButton" disable="true" mnemonicParsing="false" text="%cloudbackencui.button.remove" />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <Button fx:id="cloudServicesSetupButton" disable="true" layoutX="535.0" layoutY="52.0" mnemonicParsing="false" text="%cloudbackencui.button.setup.with.arrow" AnchorPane.topAnchor="52.0" />
+               <GridPane.margin>
+                  <Insets left="7.0" right="7.0" />
+               </GridPane.margin>
+            </VBox>
          </children>
-      </AnchorPane>
+         <VBox.margin>
+            <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+         </VBox.margin>
+      </GridPane>
    </children>
 </VBox>

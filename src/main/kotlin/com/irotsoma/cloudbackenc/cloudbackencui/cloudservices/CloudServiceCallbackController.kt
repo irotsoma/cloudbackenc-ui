@@ -16,7 +16,7 @@
 /*
  * Created by irotsoma on 8/12/16.
  */
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.cloudservices
 
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.CloudServiceWebView
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceCallbackURL

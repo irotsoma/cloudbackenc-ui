@@ -16,7 +16,7 @@
 /*
  * Created by irotsoma on 7/27/2016.
  */
-package com.irotsoma.cloudbackenc.cloudbackencui
+package com.irotsoma.cloudbackenc.cloudbackencui.cloudservices
 
 import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
 import tornadofx.*
