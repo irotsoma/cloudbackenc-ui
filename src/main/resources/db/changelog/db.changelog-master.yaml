@@ -15,13 +15,13 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: username
-                  type: nvarchar(255)
+                  type: nvarchar(max)
                   constraints:
                     unique: true
                     nullable: false
               - column:
                   name: token
-                  type: nvarchar(255)
+                  type: nvarchar(max)
                   constraints:
                     nullable: false
               - column:
