@@ -109,6 +109,8 @@ dependencies {
     compile "no.tornado:tornadofx:$tornadofxVersion"
     //h2
     compile 'com.h2database:h2'
+    //mariaDb
+    compile 'org.mariadb.jdbc:mariadb-java-client'
     //liquibase
     compile 'org.liquibase:liquibase-core'
     //logging
