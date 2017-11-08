@@ -8,20 +8,20 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: int
+                  type: long
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: username
-                  type: nvarchar(max)
+                  type: nvarchar(1023)
                   constraints:
                     unique: true
                     nullable: false
               - column:
                   name: token
-                  type: nvarchar(max)
+                  type: nvarchar(5000)
                   constraints:
                     nullable: false
               - column:
