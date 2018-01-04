@@ -49,7 +49,7 @@ class CloudBackEncUIApp : App(MainView::class, CloudBackEncUIStyles::class){
          */
         @JvmStatic fun launchApp(args: Array<String>){
             savedArgs = args
-            launch(CloudBackEncUIApp::class.java, *args)
+            launch<CloudBackEncUIApp>(*args)
         }
     }
 

@@ -18,7 +18,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui.cloudservices
 
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtension
+import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionConfig
 import tornadofx.*
 
 /**
@@ -29,7 +29,7 @@ import tornadofx.*
  * @property name Binds the cloud service name to the table.
  * @property token Binds a cloud service's authentication token to a row.  Should not be displayed in the table.
  */
-class CloudServiceModel : ItemViewModel<CloudServiceExtension>() {
-    val uuid = bind { item?.observable(CloudServiceExtension::uuid) }
-    val name = bind { item?.observable(CloudServiceExtension::name) }
+class CloudServiceModel : ItemViewModel<CloudServiceExtensionConfig>() {
+    val uuid = bind { item?.observable(CloudServiceExtensionConfig::serviceUuid) }
+    val name = bind { item?.observable(CloudServiceExtensionConfig::serviceName) }
 }

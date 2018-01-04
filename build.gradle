@@ -15,14 +15,15 @@
  */
 buildscript {
     ext.commonVersion = '0.3-SNAPSHOT'
-    ext.springBootVersion = '1.5.8.RELEASE'
-    ext.tornadofxVersion = '1.7.11'
+    ext.springBootVersion = '1.5.9.RELEASE'
+    ext.tornadofxVersion = '1.7.14'
     ext.junitVersion = '4.12'
     ext.kotlinVersion = '1.2.10'
     ext.dokkaVersion = '0.9.14'
     ext.liquibaseGradleVersion = '1.2.4'
     ext.kotlinLoggingVersion = '1.4.6'
     ext.propdepsPluginVersion='0.0.10.RELEASE'
+    ext.jacksonVersion='2.9.3'
 
     repositories {
         mavenCentral()
@@ -96,10 +97,10 @@ dependencies {
     optional 'org.springframework.boot:spring-boot-devtools'
     optional 'org.springframework.boot:spring-boot-configuration-processor'
     //jackson
-    compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
-    compile 'com.fasterxml.jackson.core:jackson-core'
-    compile 'com.fasterxml.jackson.core:jackson-databind'
-    compile 'com.fasterxml.jackson.core:jackson-annotations'
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     //common classes
     compile "com.irotsoma.cloudbackenc:common:$commonVersion"
     compile "com.irotsoma.cloudbackenc.common:cloudservicesserviceinterface:$commonVersion"
