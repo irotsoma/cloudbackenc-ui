@@ -30,6 +30,6 @@ import tornadofx.*
  * @property token Binds a cloud service's authentication token to a row.  Should not be displayed in the table.
  */
 class CloudServiceModel : ItemViewModel<CloudServiceExtension>() {
-    val uuid = bind { item?.observable(CloudServiceExtension::serviceUuid) }
-    val name = bind { item?.observable(CloudServiceExtension::serviceName) }
+    val uuid = bind { item?.observable(CloudServiceExtension::extensionUuid) }
+    val name = bind { item?.observable(CloudServiceExtension::extensionName) }
 }
