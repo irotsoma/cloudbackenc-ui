@@ -103,8 +103,8 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     //common classes
     compile "com.irotsoma.cloudbackenc:common:$commonVersion"
-    compile "com.irotsoma.cloudbackenc.common:cloudservicesserviceinterface:$commonVersion"
-    compile "com.irotsoma.cloudbackenc.common:encryptionserviceinterface:$commonVersion"
+    compile "com.irotsoma.cloudbackenc.common:cloudservices:$commonVersion"
+    compile "com.irotsoma.cloudbackenc.common:encryption:$commonVersion"
     //tornadofx
     compile "no.tornado:tornadofx:$tornadofxVersion"
     //h2

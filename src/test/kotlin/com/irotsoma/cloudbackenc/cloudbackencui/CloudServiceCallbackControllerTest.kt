@@ -18,7 +18,7 @@
  */
 package com.irotsoma.cloudbackenc.cloudbackencui
 
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceCallbackURL
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceCallbackURL
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Value

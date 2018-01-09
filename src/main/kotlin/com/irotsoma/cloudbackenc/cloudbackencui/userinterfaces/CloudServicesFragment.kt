@@ -23,10 +23,10 @@ import com.irotsoma.cloudbackenc.cloudbackencui.UserPreferences
 import com.irotsoma.cloudbackenc.cloudbackencui.cloudservices.CloudServiceModel
 import com.irotsoma.cloudbackenc.cloudbackencui.trustSelfSignedSSL
 import com.irotsoma.cloudbackenc.cloudbackencui.users.UserAccountManager
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceException
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionConfig
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceExtensionConfigList
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceUser
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceException
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceExtension
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceExtensionList
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceUser
 import javafx.collections.ObservableList
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -42,7 +42,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import tornadofx.*
-import java.util.*
 
 /**
  * Cloud Services UI functionality
@@ -51,7 +50,7 @@ import java.util.*
 */
 
 class CloudServicesFragment : Fragment() {
-    private data class CloudServicesLists(val availableCloudServices:ObservableList<CloudServiceExtensionConfig>, val activeCloudServices:ObservableList<CloudServiceExtensionConfig>)
+    private data class CloudServicesLists(val availableCloudServices:ObservableList<CloudServiceExtension>, val activeCloudServices:ObservableList<CloudServiceExtension>)
     /** kotlin-logging implementation*/
     companion object: KLogging()
     override val root: VBox by fxml()
@@ -59,9 +58,9 @@ class CloudServicesFragment : Fragment() {
     val cloudServicesSetupButton : Button by fxid("cloudServicesSetupButton")
     val cloudServicesRefreshButton : Button by fxid("cloudServicesRefreshButton")
     val cloudServicesRemoveButton : Button by fxid("cloudServicesRemoveButton")
-    val availableCloudServicesTable : TableView<CloudServiceExtensionConfig> by fxid("availableCloudServicesTable")
+    val availableCloudServicesTable : TableView<CloudServiceExtension> by fxid("availableCloudServicesTable")
     val activeCloudServiceModel: CloudServiceModel by inject()
-    val activeCloudServicesTable : TableView<CloudServiceExtensionConfig> by fxid("activeCloudServicesTable")
+    val activeCloudServicesTable : TableView<CloudServiceExtension> by fxid("activeCloudServicesTable")
     val userAccountRepository = UserAccountManager().userAccountRepository
 
     init {
@@ -71,9 +70,9 @@ class CloudServicesFragment : Fragment() {
         with (availableCloudServicesTable) {
             placeholder = Label(messages["cloudbackencui.message.loading.services"])
             //uuid column
-            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtensionConfig::serviceUuid)
+            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::serviceUuid)
             //name column
-            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtensionConfig::serviceName)
+            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::serviceName)
             //bind to list of services through model
             bindSelected(availableCloudServicesModel)
             //only enable setup button if something is selected
@@ -85,9 +84,9 @@ class CloudServicesFragment : Fragment() {
         with (activeCloudServicesTable){
             placeholder = Label(messages["cloudbackencui.message.loading.services"])
             //uuid column
-            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtensionConfig::serviceUuid)
+            column(messages["cloudbackencui.column.cloud.service.id"], CloudServiceExtension::serviceUuid)
             //name column
-            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtensionConfig::serviceName).remainingWidth()
+            column(messages["cloudbackencui.column.cloud.service.name"], CloudServiceExtension::serviceName).remainingWidth()
             //bind to list of services through model
             bindSelected(activeCloudServiceModel)
             //only enable remove button if something is selected
@@ -98,7 +97,7 @@ class CloudServicesFragment : Fragment() {
         }
         cloudServicesSetupButton.setOnAction {
             if (availableCloudServicesModel.item.requiresPassword || availableCloudServicesModel.item.requiresUsername) {
-                val userInfoPopup = UserInfoFragment(availableCloudServicesModel.item.serviceName ?: "Unknown")
+                val userInfoPopup = UserInfoFragment(availableCloudServicesModel.item.serviceName)
                 logger.trace{"Attempting to open user info popup."}
                 if (!availableCloudServicesModel.item.requiresUsername) {
                     userInfoPopup.userInfoUsernameField.isDisable = true
@@ -144,7 +143,7 @@ class CloudServicesFragment : Fragment() {
             activeCloudServicesTable.placeholder = null
         }
     }
-    private fun getLoggedInCloudServices(username: String): CloudServiceExtensionConfigList{
+    private fun getLoggedInCloudServices(username: String): CloudServiceExtensionList{
         try {
             val restInterface = CentralControllerRestInterface()
             if ((restInterface.centralControllerSettings!!.useSSL) && (restInterface.centralControllerSettings!!.disableCertificateValidation)) {
@@ -156,7 +155,7 @@ class CloudServicesFragment : Fragment() {
             val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
             requestHeaders.add(HttpHeaders.AUTHORIZATION,"Bearer $userToken")
             val httpEntity = HttpEntity<Any>(requestHeaders)
-            return RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/$username",HttpMethod.GET,httpEntity, CloudServiceExtensionConfigList::class.java).body ?: CloudServiceExtensionConfigList()
+            return RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/$username",HttpMethod.GET,httpEntity, CloudServiceExtensionList::class.java).body ?: CloudServiceExtensionList()
         }
         catch (e: ResourceAccessException){
             throw(CloudServiceException(messages["cloudbackencui.error.getting.cloud.services.list"], e))
@@ -169,7 +168,7 @@ class CloudServicesFragment : Fragment() {
                 trustSelfSignedSSL()
                 logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
             }
-            var availableCloudServices =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionConfigList()::class.java)
+            var availableCloudServices =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList()::class.java)
             if (availableCloudServices.size < 1){
                 throw(CloudServiceException(messages["cloudbackencui.error.cloud.services.list.empty"]))
             }
@@ -178,13 +177,13 @@ class CloudServicesFragment : Fragment() {
                  try {
                     getLoggedInCloudServices(username)
                 } catch (e: Exception){
-                    CloudServiceExtensionConfigList()
+                     CloudServiceExtensionList()
                 }
             } else {
-                CloudServiceExtensionConfigList()
+                CloudServiceExtensionList()
             }
             if(activeCloudServices.isNotEmpty()) {
-                availableCloudServices = CloudServiceExtensionConfigList(availableCloudServices.filter{ it !in activeCloudServices })
+                availableCloudServices = CloudServiceExtensionList(availableCloudServices.filter{ it !in activeCloudServices })
             }
             return CloudServicesLists(availableCloudServices.observable(),activeCloudServices.observable())
         }

@@ -19,7 +19,7 @@
 package com.irotsoma.cloudbackenc.cloudbackencui.cloudservices
 
 import com.irotsoma.cloudbackenc.cloudbackencui.userinterfaces.CloudServiceWebView
-import com.irotsoma.cloudbackenc.common.cloudservicesserviceinterface.CloudServiceCallbackURL
+import com.irotsoma.cloudbackenc.common.cloudservices.CloudServiceCallbackURL
 import javafx.application.Platform
 import mu.KLogging
 import org.springframework.http.HttpStatus
