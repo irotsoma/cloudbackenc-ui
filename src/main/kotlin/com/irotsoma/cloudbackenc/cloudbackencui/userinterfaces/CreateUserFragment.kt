@@ -117,11 +117,11 @@ class CreateUserFragment : Fragment() {
         //TODO: add progress spinner
         runAsync {
             //make call to add user
-            val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/users", httpEntity, CloudBackEncUser::class.java)
+            val callResponse = RestTemplate().postForEntity("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.usersPath}", httpEntity, CloudBackEncUser::class.java)
             logger.debug{"Create User call response: ${callResponse.statusCode}: ${callResponse.statusCodeValue}"}
             if (callResponse.statusCode == HttpStatus.CREATED) {
                 //make call to create a token
-                val tokenResponse = RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/auth", HttpMethod.GET, httpTokenEntity, AuthenticationToken::class.java)
+                val tokenResponse = RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.authPath}", HttpMethod.GET, httpTokenEntity, AuthenticationToken::class.java)
                 if (tokenResponse.statusCode == HttpStatus.OK) {
                     //update or insert user in database
                     val userAccountRepository = UserAccountManager().userAccountRepository

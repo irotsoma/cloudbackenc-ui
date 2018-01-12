@@ -155,7 +155,7 @@ class CloudServicesFragment : Fragment() {
             val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
             requestHeaders.add(HttpHeaders.AUTHORIZATION,"Bearer $userToken")
             val httpEntity = HttpEntity<Any>(requestHeaders)
-            return RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/$username",HttpMethod.GET,httpEntity, CloudServiceExtensionList::class.java).body ?: CloudServiceExtensionList()
+            return RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}$username",HttpMethod.GET,httpEntity, CloudServiceExtensionList::class.java).body ?: CloudServiceExtensionList()
         }
         catch (e: ResourceAccessException){
             throw(CloudServiceException(messages["cloudbackencui.error.getting.cloud.services.list"], e))
@@ -168,7 +168,7 @@ class CloudServicesFragment : Fragment() {
                 trustSelfSignedSSL()
                 logger.warn{"SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!"}
             }
-            var availableCloudServices =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services", CloudServiceExtensionList()::class.java)
+            var availableCloudServices =  RestTemplate().getForObject("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}", CloudServiceExtensionList()::class.java)
             if (availableCloudServices.size < 1){
                 throw(CloudServiceException(messages["cloudbackencui.error.cloud.services.list.empty"]))
             }

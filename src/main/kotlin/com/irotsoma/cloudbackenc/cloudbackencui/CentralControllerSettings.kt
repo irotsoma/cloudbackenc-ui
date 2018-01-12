@@ -48,4 +48,21 @@ class CentralControllerSettings {
      * Disables SSL certificate validation.  Should only be true for testing purposes with self signed certificates.
      */
     var disableCertificateValidation: Boolean = false
+    /**
+     * Path to the cloud services rest service
+     */
+    var cloudServicesPath: String = ""
+    /**
+     * Path to the users rest service
+     */
+    var usersPath: String = ""
+    /**
+     * Path to the auth rest service
+     */
+    var authPath: String = ""
+    /**
+     * Path to the files rest service
+     */
+    var filesPath: String = ""
+
 }
