@@ -19,7 +19,7 @@ buildscript {
     ext.tornadofxVersion = '1.7.14'
     ext.junitVersion = '4.12'
     ext.kotlinVersion = '1.2.21'
-    ext.dokkaVersion = '0.9.15'
+    ext.dokkaVersion = '0.9.14'
     ext.liquibaseGradleVersion = '1.2.4'
     ext.kotlinLoggingVersion = '1.5.3'
     ext.propdepsPluginVersion='0.0.10.RELEASE'
