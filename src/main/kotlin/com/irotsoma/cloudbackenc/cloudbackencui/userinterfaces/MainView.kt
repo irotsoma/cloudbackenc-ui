@@ -84,13 +84,13 @@ class MainView : View() {
                         trustSelfSignedSSL()
                         logger.warn { "SSL is enabled, but certificate validation is disabled.  This should only be used in test environments!" }
                     }
-                    val tokenResponse = RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/auth/token", HttpMethod.GET, httpTokenEntity, AuthenticationToken::class.java)
+                    val tokenResponse = RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.authPath}", HttpMethod.GET, httpTokenEntity, AuthenticationToken::class.java)
                     if (tokenResponse.statusCode == HttpStatus.OK) {
                         //update or insert user in database
                         val userAccountRepository = UserAccountManager().userAccountRepository
-                        val userAccount = userAccountRepository.findByUsername(user)
+                        var userAccount = userAccountRepository.findByUsername(user)
                         if (userAccount == null){
-                            UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
+                            userAccount = UserAccount(user, tokenResponse.body.token,tokenResponse.body.tokenExpiration)
                         } else {
                             userAccount.token = tokenResponse.body.token
                             userAccount.tokenExpiration = tokenResponse.body.tokenExpiration

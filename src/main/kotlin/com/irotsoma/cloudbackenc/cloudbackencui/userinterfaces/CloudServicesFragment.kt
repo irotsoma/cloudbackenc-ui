@@ -210,7 +210,7 @@ class CloudServicesFragment : Fragment() {
             val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
             logger.debug { "Calculated callback address: $callbackURL" }
             val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", password, availableCloudServicesModel.item.extensionUuid.toString(), callbackURL), requestHeaders)
-            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/login/${availableCloudServicesModel.item.extensionUuid}"
+            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}/login/${availableCloudServicesModel.item.extensionUuid}"
             logger.debug { "Connecting to central controller cloud service login service at $centralControllerURL" }
             runAsync {
                 val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
@@ -235,7 +235,7 @@ class CloudServicesFragment : Fragment() {
             val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
             requestHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
             val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", null, availableCloudServicesModel.item.extensionUuid.toString(), null),requestHeaders)
-            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}/cloud-services/logout/${activeCloudServiceModel.item.extensionUuid}"
+            val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}/logout/${activeCloudServiceModel.item.extensionUuid}"
             runAsync {
                 val callResponse = RestTemplate().exchange(centralControllerURL, HttpMethod.GET, httpEntity, CloudServiceUser.STATE::class.java)
                 logger.debug { "Cloud service logout call response: ${callResponse?.statusCode}: ${callResponse?.statusCode?.name}" }
