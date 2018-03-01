@@ -134,7 +134,7 @@ class CloudServicesFragment : Fragment() {
             items.clear()
         }
         runAsync {
-            val username = userAccountRepository.findById(UserPreferences.activeUser)?.username
+            val username = userAccountRepository.findById(UserPreferences.activeUser).get().username
             val (availableCloudServices, activeCloudServices) = getCloudServices(username)
             availableCloudServicesTable.items = availableCloudServices
             activeCloudServicesTable.items = activeCloudServices
@@ -152,7 +152,7 @@ class CloudServicesFragment : Fragment() {
             }
             val requestHeaders = HttpHeaders()
             //TODO: Check token for expiration or null and prompt for login
-            val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
+            val userToken = userAccountRepository.findById(UserPreferences.activeUser).get().token
             requestHeaders.add(HttpHeaders.AUTHORIZATION,"Bearer $userToken")
             val httpEntity = HttpEntity<Any>(requestHeaders)
             return RestTemplate().exchange("${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}$username",HttpMethod.GET,httpEntity, CloudServiceExtensionList::class.java).body ?: CloudServiceExtensionList()
@@ -204,7 +204,7 @@ class CloudServicesFragment : Fragment() {
             requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             //TODO: Check token for expiration or null and prompt for login
 
-            val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
+            val userToken = userAccountRepository.findById(UserPreferences.activeUser).get().token
             requestHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
 
             val callbackURL = "${restInterface.localProtocol}://${restInterface.localHostname}:${restInterface.localPort}/cloud-service-callback"
@@ -214,8 +214,8 @@ class CloudServicesFragment : Fragment() {
             logger.debug { "Connecting to central controller cloud service login service at $centralControllerURL" }
             runAsync {
                 val callResponse = RestTemplate().postForEntity(centralControllerURL, httpEntity, CloudServiceUser.STATE::class.java)
-                logger.debug { "Cloud service setup call response: ${callResponse?.statusCode}: ${callResponse?.statusCode?.name}" }
-                logger.debug { "Cloud service user state: ${callResponse?.body?.name}" }
+                logger.debug { "Cloud service setup call response: ${callResponse.statusCode}: ${callResponse.statusCode?.name}" }
+                logger.debug { "Cloud service user state: ${callResponse.body?.name}" }
             } ui {
                 refreshTables()
             }
@@ -232,7 +232,7 @@ class CloudServicesFragment : Fragment() {
             }
             val requestHeaders = HttpHeaders()
             requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            val userToken = userAccountRepository.findById(UserPreferences.activeUser)?.token
+            val userToken = userAccountRepository.findById(UserPreferences.activeUser).get().token
             requestHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
             val httpEntity = HttpEntity<CloudServiceUser>(CloudServiceUser(userId ?: "", null, availableCloudServicesModel.item.extensionUuid.toString(), null),requestHeaders)
             val centralControllerURL = "${restInterface.centralControllerProtocol}://${restInterface.centralControllerSettings!!.host}:${restInterface.centralControllerSettings!!.port}${restInterface.centralControllerSettings!!.cloudServicesPath}/logout/${activeCloudServiceModel.item.extensionUuid}"
