@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 buildscript {
-    ext.commonVersion = '0.3-SNAPSHOT'
+    ext.commonVersion = '0.3'
     ext.springBootVersion = '2.0.0.RELEASE'
     ext.tornadofxVersion = '1.7.14'
     ext.junitVersion = '4.12'
@@ -51,7 +51,7 @@ plugins {
 
 
 group 'com.irotsoma.cloudbackenc'
-version '0.3-SNAPSHOT'
+version '0.3'
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
