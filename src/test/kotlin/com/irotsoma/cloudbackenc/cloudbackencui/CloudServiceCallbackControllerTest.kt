@@ -59,7 +59,7 @@ class CloudServiceCallbackControllerTest {
         }
         val requestHeaders = HttpHeaders()
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        val httpEntity = HttpEntity<CloudServiceCallbackURL>(CloudServiceCallbackURL(testUUID, "https://irotsoma.com"), requestHeaders)
+        val httpEntity = HttpEntity<CloudServiceCallbackURL>(CloudServiceCallbackURL(testUUID, "https://irotsoma.com/mail"), requestHeaders)
         val returnValue = restTemplate.postForEntity("$protocol://localhost:$port/cloud-service-callback", httpEntity, Map::class.java)
         assert(returnValue.statusCode == HttpStatus.ACCEPTED)
 }}
