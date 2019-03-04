@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018  Irotsoma, LLC
+ * Copyright (C) 2016-2019  Irotsoma, LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,8 +22,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.PasswordField
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
-import tornadofx.Fragment
-import tornadofx.get
+import tornadofx.*
 
 /**
  * User Login Screen
