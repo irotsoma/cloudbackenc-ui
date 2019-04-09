@@ -58,7 +58,7 @@ class CloudServiceCallbackController {
             return(ResponseEntity(HttpStatus.ACCEPTED))
         }
 
-        Platform.runLater({
+        Platform.runLater {
             //try to open the browser to the authentication URL using awt Desktop.  If not possible, use custom webview instead
             var browserSuccess = false
             try {
@@ -75,7 +75,7 @@ class CloudServiceCallbackController {
             if (!browserSuccess) {
                 CloudServiceWebView(url.authorizationURL).openModal()
             }
-        })
+        }
         return(ResponseEntity(HttpStatus.ACCEPTED))
     }
 }
